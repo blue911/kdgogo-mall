@@ -234,6 +234,7 @@ a{color:inherit;text-decoration:none}
       <button class="nav-link" data-goto="home">首页</button>
       <button class="nav-link" data-goto="shop">全部商品</button>
       <button class="nav-link" data-filter-new="1">新品尝鲜</button>
+      <a class="nav-link" href="orders.html">订单查询</a>
       <button class="nav-link" data-goto="about">关于本站</button>
     </nav>
     <div class="header-actions">
@@ -331,6 +332,7 @@ a{color:inherit;text-decoration:none}
         <button class="f-item" data-goto="home">首页</button>
         <button class="f-item" data-goto="shop">全部商品</button>
         <button class="f-item" data-filter-new="1">新品尝鲜</button>
+        <a class="f-item" href="orders.html">订单查询</a>
         <button class="f-item" id="footerCartLink">购物车</button>
       </div>
       <div class="footer-col">
@@ -372,7 +374,7 @@ a{color:inherit;text-decoration:none}
         </div>
         <button class="btn-primary" id="modalAdd">加入购物车</button>
       </div>
-      <p class="modal-note">演示站点：下单与支付功能未开放，购物车数据保存在本机浏览器。</p>
+      <p class="modal-note">演示站点：支持模拟下单与支付，购物车数据保存在本机浏览器。</p>
     </div>
   </div>
 </div>
@@ -630,7 +632,7 @@ $("#qtyMinus").addEventListener("click", () => { modalQty = Math.max(1, modalQty
 $("#qtyPlus").addEventListener("click", () => { modalQty = Math.min(99, modalQty+1); $("#qtyVal").textContent = modalQty; });
 $("#modalAdd").addEventListener("click", () => { if(modalId) addToCart(modalId, modalQty); });
 
-$("#checkoutBtn").addEventListener("click", () => toast("演示站点：结算功能未开放，商品已保存在本地"));
+$("#checkoutBtn").addEventListener("click", () => { if(!cartCount()){ toast("购物车是空的，先去逛逛吧"); return; } location.href = "checkout.html"; });
 $("#clearBtn").addEventListener("click", () => { if(!cartCount()){ toast("购物车已经是空的"); return; } cart = {}; saveCart(); toast("购物车已清空"); });
 
 document.addEventListener("keydown", e => { if (e.key === "Escape"){ closeModal(); closeDrawer(); } });

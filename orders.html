@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>订单查询 · 橙屿商城</title>
+<meta name="description" content="橙屿商城订单查询：按订单号查询订单状态与物流进度。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23E84E0A'/><text x='32' y='45' font-size='34' text-anchor='middle' fill='%23fff' font-family='serif'>屿</text></svg>">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+:root{
+  --ink:#21201E; --ink-2:#5C5851; --muted:#8A857C; --paper:#FFFDF9; --warm:#F6F1E8;
+  --line:#EAE3D5; --brand:#E84E0A; --brand-deep:#C24005; --brand-soft:#FCE8DB;
+  --ok:#2E7D4F; --radius:14px;
+  --shadow:0 12px 32px rgba(33,32,30,.10);
+  --font-ui:"Noto Sans SC","PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;
+  --font-display:"Noto Serif SC","Songti SC","STSong","SimSun",serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-ui);color:var(--ink);background:var(--paper);line-height:1.6;-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input{font-family:inherit}
+a{color:inherit;text-decoration:none}
+.container{max-width:980px;margin:0 auto;padding:0 20px}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+
+/* ===== 顶栏（与首页统一） ===== */
+.site-header{position:sticky;top:0;z-index:40;background:var(--paper);border-bottom:1px solid var(--line)}
+.header-inner{display:flex;align-items:center;gap:24px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;letter-spacing:.5px}
+.brand svg{width:30px;height:30px;flex:none}
+.main-nav{display:flex;gap:4px;margin-left:8px}
+.nav-link{padding:8px 12px;border-radius:9px;font-size:14px;color:var(--ink-2);transition:color .15s,background .15s}
+.nav-link:hover{color:var(--brand);background:var(--brand-soft)}
+.header-actions{margin-left:auto;display:flex;align-items:center;gap:12px}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:500;color:var(--ink-2);padding:8px 12px;border-radius:9px;transition:color .15s,background .15s}
+.back-link:hover{color:var(--brand);background:var(--brand-soft)}
+.back-link svg{width:16px;height:16px}
+
+/* ===== 页面主区 ===== */
+.page{padding:44px 0 72px}
+.page-head{margin-bottom:26px}
+.page-eyebrow{display:inline-block;font-size:13px;font-weight:500;color:var(--brand);background:var(--brand-soft);padding:5px 12px;border-radius:999px;margin-bottom:14px}
+.page-head h1{font-family:var(--font-display);font-size:34px;font-weight:900;letter-spacing:.5px}
+.page-head p{color:var(--muted);font-size:14px;margin-top:8px}
+
+/* 搜索 */
+.search-bar{display:flex;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:22px;box-shadow:0 4px 14px rgba(33,32,30,.05)}
+.search-bar svg{width:20px;height:20px;color:var(--muted);flex:none}
+.search-bar input{flex:1;border:none;outline:none;font-size:15px;color:var(--ink);background:transparent}
+.search-bar input::placeholder{color:#B8B2A6}
+.search-btn{background:var(--brand);color:#fff;font-size:14px;font-weight:600;padding:11px 22px;border-radius:10px;transition:background .15s}
+.search-btn:hover{background:var(--brand-deep)}
+.search-hint{font-size:12px;color:var(--muted);margin:-10px 0 22px}
+
+/* 状态筛选 */
+.status-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+.stab{padding:8px 16px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:13px;color:var(--ink-2);transition:all .15s}
+.stab:hover{border-color:var(--brand);color:var(--brand)}
+.stab.active{background:var(--ink);border-color:var(--ink);color:#fff}
+
+/* 订单卡片 */
+.order-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);margin-bottom:16px;overflow:hidden;transition:box-shadow .2s}
+.order-card:hover{box-shadow:var(--shadow)}
+.order-head{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.order-no{font-family:ui-monospace,Consolas,monospace;font-size:13px;letter-spacing:.3px;color:var(--ink-2)}
+.order-date{font-size:12px;color:var(--muted)}
+.order-status{margin-left:auto;font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px}
+.st-pending{background:var(--warm);color:#9A5B00}
+.st-paid{background:var(--brand-soft);color:var(--brand-deep)}
+.st-shipped{background:#E8F0FC;color:#2B6CB0}
+.st-done{background:#E7F3EC;color:var(--ok)}
+.st-closed{background:#EFEDE7;color:var(--muted)}
+
+.order-body{display:flex;gap:16px;padding:16px 20px;align-items:center}
+.order-thumb{width:66px;height:66px;border-radius:12px;object-fit:cover;background:var(--warm);border:1px solid var(--line);flex:none}
+.order-items-info{flex:1;min-width:0}
+.o-line{font-size:14px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.o-meta{font-size:12px;color:var(--muted);margin-top:3px}
+.o-total{text-align:right;flex:none}
+.o-total .lbl{font-size:12px;color:var(--muted)}
+.o-total b{font-family:var(--font-display);font-size:20px;font-weight:900;color:var(--brand-deep)}
+.o-total small{font-size:12px;font-weight:700;margin-right:1px}
+
+.order-foot{display:flex;align-items:center;gap:10px;padding:12px 20px;border-top:1px dashed var(--line);flex-wrap:wrap}
+.order-foot .status-text{font-size:13px;color:var(--ink-2)}
+.order-foot .ops{margin-left:auto;display:flex;gap:8px}
+.mini-btn{border:1px solid var(--line);background:#fff;color:var(--ink-2);font-size:13px;font-weight:600;padding:7px 14px;border-radius:9px;transition:border .15s,color .15s}
+.mini-btn:hover{border-color:var(--brand);color:var(--brand)}
+.mini-btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.mini-btn.primary:hover{background:var(--brand-deep)}
+
+/* 时间线 */
+.timeline{margin:6px 2px 2px}
+.t-item{display:flex;gap:14px;position:relative;padding-bottom:22px}
+.t-item:last-child{padding-bottom:0}
+.t-item::before{content:"";position:absolute;left:8px;top:20px;bottom:0;width:2px;background:var(--line)}
+.t-item:last-child::before{display:none}
+.t-dot{width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--line);flex:none;position:relative;z-index:1;margin-top:2px}
+.t-item.done .t-dot{background:var(--ok);border-color:var(--ok)}
+.t-item.done .t-dot::after{content:"";position:absolute;inset:0;margin:auto;width:8px;height:8px;border-radius:50%;background:var(--ok)}
+.t-item.cur .t-dot{background:var(--brand);border-color:var(--brand);box-shadow:0 0 0 4px var(--brand-soft)}
+.t-item .t-main{flex:1;padding-top:1px}
+.t-item .t-title{font-size:14px;font-weight:600}
+.t-item .t-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.t-item.cur .t-title{color:var(--brand)}
+.t-item.done .t-title{color:var(--ink-2)}
+
+/* 收货信息条 */
+.recv{background:var(--warm);border-top:1px solid var(--line);padding:12px 20px;font-size:13px;color:var(--ink-2)}
+.recv b{color:var(--ink);font-weight:600}
+
+/* 空状态 */
+.empty-wrap{text-align:center;padding:70px 20px;color:var(--muted)}
+.empty-wrap svg{width:48px;height:48px;color:#CFC8BA;margin:0 auto 16px}
+.empty-wrap b{display:block;font-size:16px;color:var(--ink-2);margin-bottom:6px;font-family:var(--font-display)}
+
+.hide{display:none!important}
+
+/* 页脚（与首页统一） */
+.site-footer{background:#242220;color:#CFC9BE;padding:56px 0 26px;margin-top:40px}
+.footer-grid{display:grid;grid-template-columns:1.6fr 1fr 1.2fr;gap:40px}
+.footer-brand b{font-family:var(--font-display);font-size:20px;color:#fff}
+.footer-brand p{font-size:13px;line-height:1.8;color:#A8A196;margin-top:10px;max-width:38ch}
+.footer-col b{font-size:14px;color:#fff;display:block;margin-bottom:14px}
+.footer-col a,.footer-col .f-item{display:block;font-size:13px;color:#A8A196;margin-bottom:9px;transition:color .15s;cursor:pointer;background:none;border:none;text-align:left;padding:0}
+.footer-col a:hover,.footer-col .f-item:hover{color:var(--brand-soft)}
+.footer-bottom{border-top:1px solid #3A3833;margin-top:40px;padding-top:20px;font-size:12px;color:#8E887D;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
+/* Toast */
+.toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(16px);background:var(--ink);color:#fff;font-size:14px;padding:11px 20px;border-radius:999px;opacity:0;visibility:hidden;transition:all .25s;z-index:70;box-shadow:var(--shadow);white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
+.toast.show{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
+
+@media (max-width:720px){
+  .main-nav{display:none}
+  .header-inner{height:auto;padding:12px 0;flex-wrap:wrap;gap:10px}
+  .page{padding:26px 0 56px}
+  .page-head h1{font-size:28px}
+  .footer-grid{grid-template-columns:1fr;gap:28px}
+  .order-body{flex-wrap:wrap}
+  .o-total{margin-left:auto}
+  .order-foot .ops{width:100%;margin-left:0}
+}
+
+/* 可折叠时间线 */
+.toggle-btn{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--brand);font-weight:600;cursor:pointer;background:none;border:none}
+.toggle-btn svg{width:13px;height:13px;transition:transform .2s}
+.order-card.open .toggle-ico{transform:rotate(180deg)}
+.order-card .timeline{display:none}
+.order-card.open .timeline{display:block}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="./" aria-label="橙屿商城首页">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#E84E0A"/><path d="M16 8c-1.2 3.2-4 5-8 5.6V15c4.6.7 7.2 2.9 8 6.8 1-3.9 3.6-6.1 8.2-6.8v-1.4C20 13 17.2 11.2 16 8z" fill="#fff"/></svg>
+      橙屿商城
+    </a>
+    <nav class="main-nav" aria-label="主导航">
+      <a class="nav-link" href="./">首页</a>
+      <a class="nav-link" href="./checkout.html">去结算</a>
+    </nav>
+    <div class="header-actions">
+      <a class="back-link" href="./">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        返回商城
+      </a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="page">
+    <div class="container">
+      <div class="page-head">
+        <span class="page-eyebrow">橙屿商城 · 订单中心</span>
+        <h1>订单查询</h1>
+        <p>输入订单号即可查询订单状态与物流进度，本机订单会全部列在下方。</p>
+      </div>
+
+      <div class="search-bar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="search" id="searchInput" placeholder="输入订单号，如 OY20261029…" aria-label="按订单号查询">
+        <button class="search-btn" id="searchBtn">查询</button>
+      </div>
+      <div class="search-hint" id="searchHint"></div>
+
+      <div class="status-tabs" id="statusTabs">
+        <button class="stab active" data-status="all">全部</button>
+        <button class="stab" data-status="pending">待支付</button>
+        <button class="stab" data-status="paid">已支付</button>
+        <button class="stab" data-status="shipped">已发货</button>
+        <button class="stab" data-status="done">已完成</button>
+        <button class="stab" data-status="closed">已关闭</button>
+      </div>
+
+      <div id="listWrap"></div>
+
+      <div class="empty-wrap hide" id="emptyWrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M5 7l1-4h12l1 4M6 7v13a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7"/><path d="M10 11v6M14 11v6"/></svg>
+        <b id="emptyTitle">暂无订单</b>
+        <span id="emptyDesc">下单后可在这里查询订单状态</span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <b>橙屿商城</b>
+        <p>一个开源的演示型购物网站：商品展示、搜索筛选、购物车、结算与订单状态，全部由纯前端实现，无需后端即可免费部署上线。</p>
+      </div>
+      <div class="footer-col">
+        <b>快速导航</b>
+        <a href="./">首页</a>
+        <a href="./checkout.html">去结算</a>
+        <a href="./orders.html">订单查询</a>
+      </div>
+      <div class="footer-col">
+        <b>开源与部署</b>
+        <a href="https://github.com/" target="_blank" rel="noopener">GitHub 开源仓库</a>
+        <a href="https://pages.cloudflare.com/" target="_blank" rel="noopener">Cloudflare Pages 免费托管</a>
+        <span class="f-item" id="licenseLink">MIT License 开源协议</span>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 橙屿商城 · 开源演示项目，数据均为虚构</span>
+      <span>纯 HTML / CSS / JavaScript，无后端依赖</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ===== 工具 ===== */
+const $ = (s) => document.querySelector(s);
+const toastEl = $("#toast");
+let toastTimer = null;
+function toast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove("show"), 2400);
+}
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+/* ===== 状态定义 ===== */
+const STATUS = {
+  pending:{ label:"待支付", cls:"st-pending", text:"等待买家付款" },
+  paid:   { label:"已支付", cls:"st-paid",    text:"已付款，等待商家发货" },
+  shipped:{ label:"已发货", cls:"st-shipped", text:"包裹已发出，正在运输途中" },
+  done:   { label:"已完成", cls:"st-done",    text:"订单已完成，感谢购买" },
+  closed: { label:"已关闭", cls:"st-closed",  text:"订单已关闭（超时未付款）" }
+};
+const STATUS_ORDER = ["pending","paid","shipped","done","closed"];
+
+/* ===== 读取订单 ===== */
+let orders = [];
+function loadOrders(){
+  try { orders = JSON.parse(localStorage.getItem("orange-mall-orders-v1")) || []; } catch(e){ orders = []; }
+  orders = orders.filter(o => o && o.no);
+}
+loadOrders();
+
+let curStatus = "all";
+let queryNo = "";
+
+/* 演示：支付后订单自动流转，这里可手动模拟发货/完成（纯演示状态推进） */
+function advanceOrder(o){
+  if (o.status === "paid" && !o.shippedAt){
+    o.status = "shipped"; o.shippedAt = Date.now();
+  } else if (o.status === "shipped" && !o.doneAt){
+    o.status = "done"; o.doneAt = Date.now();
+  }
+}
+function saveOrders(){
+  try { localStorage.setItem("orange-mall-orders-v1", JSON.stringify(orders)); } catch(e){}
+}
+
+/* ===== 渲染 ===== */
+function fmtDate(ts){
+  if (!ts) return "";
+  const d = new Date(ts);
+  const p = n => String(n).padStart(2,"0");
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
+function filterOrders(){
+  const q = queryNo.trim().toLowerCase();
+  return orders.filter(o => {
+    if (curStatus !== "all" && o.status !== curStatus) return false;
+    if (q && !o.no.toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
+
+function timelineFor(o){
+  const steps = [
+    { key:"created",  title:"订单提交",      sub: fmtDate(o.created),  done:true, cur:o.status==="pending" },
+    { key:"paid",     title:"支付完成",      sub: fmtDate(o.paidAt),   done:!!o.paidAt, cur:o.status==="paid" },
+    { key:"shipped",  title:"商家发货",      sub: fmtDate(o.shippedAt),done:!!o.shippedAt, cur:o.status==="shipped" },
+    { key:"done",     title:"交易完成",      sub: fmtDate(o.doneAt),   done:!!o.doneAt, cur:o.status==="done" }
+  ];
+  // 已关闭订单只展示到“订单提交”
+  if (o.status === "closed") return steps.slice(0,1).map(s => ({...s, done:true, cur:false}));
+  return steps.map(s => {
+    if (o.status === "closed") return s;
+    return s;
+  });
+}
+
+function orderCard(o){
+  const st = STATUS[o.status] || STATUS.pending;
+  const names = o.items.map(i => i.name).join("、");
+  const totalQty = o.items.reduce((s,i)=>s+i.qty,0);
+  const steps = timelineFor(o).map(s => `
+    <div class="t-item ${s.done?'done':''} ${s.cur?'cur':''}">
+      <span class="t-dot"></span>
+      <div class="t-main">
+        <div class="t-title">${s.title}</div>
+        <div class="t-sub">${s.sub}</div>
+      </div>
+    </div>`).join("");
+
+  const ops = o.status === "pending"
+    ? `<button class="mini-btn primary" data-pay="${o.no}">去支付</button>`
+    : (o.status === "paid" || o.status === "shipped" ? `<button class="mini-btn" data-advance="${o.no}">模拟推进到下一状态</button>` : "");
+
+  return `
+  <article class="order-card" data-no="${esc(o.no)}">
+    <div class="order-head">
+      <span class="order-no">${esc(o.no)}</span>
+      <span class="order-date">${fmtDate(o.created)}</span>
+      <span class="order-status ${st.cls}">${st.label}</span>
+    </div>
+    <div class="order-body">
+      <img class="order-thumb" src="${esc(o.items[0].img)}" alt="">
+      <div class="order-items-info">
+        <div class="o-line">${esc(names)}</div>
+        <div class="o-meta">共 ${totalQty} 件 · 配送费 ¥${o.deliveryFee||0}</div>
+      </div>
+      <div class="o-total">
+        <div class="lbl">实付</div>
+        <b><small>¥</small>${o.total}</b>
+      </div>
+    </div>
+    <div class="order-foot">
+      <span class="status-text">${st.text}</span>
+      <span class="ops">
+        <button class="toggle-btn" data-toggle="${esc(o.no)}">
+          <svg class="toggle-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+          物流进度
+        </button>
+        ${ops}
+      </span>
+    </div>
+    <div class="timeline">${steps}</div>
+    <div class="recv">收货信息：<b>${esc(o.receiver.name)}</b>　${esc(o.receiver.phone)}　${esc(o.receiver.addr)}</div>
+  </article>`;
+}
+
+function render(){
+  const list = filterOrders();
+  $("#listWrap").innerHTML = list.map(orderCard).join("");
+  const empty = $("#emptyWrap");
+  if (!list.length){
+    empty.classList.remove("hide");
+    $("#emptyTitle").textContent = curStatus === "all" && !queryNo ? "暂无订单" : "未找到匹配的订单";
+    $("#emptyDesc").textContent = curStatus === "all" && !queryNo ? "下单后可在这里查询订单状态" : "请检查订单号是否正确，或更换筛选条件";
+  } else {
+    empty.classList.add("hide");
+  }
+  $("#searchHint").textContent = queryNo ? `正在显示订单号包含「${queryNo}」的结果，共 ${list.length} 条` : "";
+}
+
+/* ===== 事件 ===== */
+$("#searchBtn").addEventListener("click", () => { queryNo = $("#searchInput").value.trim(); render(); });
+$("#searchInput").addEventListener("keydown", e => { if (e.key === "Enter"){ queryNo = e.target.value.trim(); render(); } });
+$("#searchInput").addEventListener("input", e => { if (!e.target.value.trim()){ queryNo = ""; render(); } });
+
+document.querySelectorAll(".stab").forEach(b => {
+  b.addEventListener("click", () => {
+    curStatus = b.dataset.status;
+    document.querySelectorAll(".stab").forEach(x => x.classList.toggle("active", x === b));
+    render();
+  });
+});
+
+$("#listWrap").addEventListener("click", e => {
+  const toggle = e.target.closest("[data-toggle]");
+  if (toggle){
+    const card = toggle.closest(".order-card");
+    card.classList.toggle("open");
+    return;
+  }
+  const pay = e.target.closest("[data-pay]");
+  if (pay){
+    location.href = "payment.html?no=" + encodeURIComponent(pay.dataset.pay);
+    return;
+  }
+  const adv = e.target.closest("[data-advance]");
+  if (adv){
+    const o = orders.find(x => x.no === adv.dataset.advance);
+    if (o){ advanceOrder(o); saveOrders(); loadOrders(); render(); toast("已模拟推进订单状态"); }
+  }
+});
+
+/* ===== 启动：读取 URL 参数（支付成功 / 超时跳转） ===== */
+const sp = new URLSearchParams(location.search);
+if (sp.get("status")){ curStatus = sp.get("status"); }
+const q = (sp.get("q") || "").trim();
+if (q){ queryNo = q; $("#searchInput").value = q; }
+
+document.querySelectorAll(".stab").forEach(b => b.classList.toggle("active", b.dataset.status === curStatus));
+render();
+$("#licenseLink").addEventListener("click", () => toast("开源协议：MIT License，详见仓库 LICENSE 文件"));
+</script>
+</body>
+</html>
