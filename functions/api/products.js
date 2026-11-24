@@ -2,10 +2,22 @@
 // POST /api/products 新增商品（需 Authorization: Bearer <管理密码>）
 import { json, isAuthed, ensureDb, rowToProduct, normalizeProduct, validateProduct } from "../_lib.js";
 
+const COLS = `name, category, catName, price, rating, isNew, image, description, feats, on_sale, sort,
+  stock, brand, model, original_price, images, free_shipping, shipping_fee`;
+
+function bindProduct(p) {
+  return [
+    p.name, p.category, p.catName, p.price, p.rating, p.isNew, p.image, p.description,
+    JSON.stringify(p.feats), p.on_sale, p.sort,
+    p.stock, p.brand, p.model, p.original_price, JSON.stringify(p.images),
+    p.free_shipping, p.shipping_fee
+  ];
+}
+
 export async function onRequest(context) {
   const { request, env } = context;
   if (!env.DB) {
-    return json({ ok: false, error: "数据库未配置：请先在 Cloudflare 后台为 orange-mall 项目绑定 D1 数据库（变量名 DB）" }, 503);
+    return json({ ok: false, error: "数据库未配置：请先在 Cloudflare 后台为本项目绑定 D1 数据库（变量名 DB）" }, 503);
   }
   await ensureDb(env);
 
@@ -22,8 +34,8 @@ export async function onRequest(context) {
     const err = validateProduct(p);
     if (err) return json({ ok: false, error: err }, 400);
     const res = await env.DB.prepare(
-      "INSERT INTO products (name, category, catName, price, rating, isNew, image, description, feats, on_sale, sort) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-    ).bind(p.name, p.category, p.catName, p.price, p.rating, p.isNew, p.image, p.description, JSON.stringify(p.feats), p.on_sale, p.sort).run();
+      `INSERT INTO products (${COLS}) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).bind(...bindProduct(p)).run();
     const created = await env.DB.prepare("SELECT * FROM products WHERE id = ?").bind(res.meta.last_row_id).first();
     return json({ ok: true, product: rowToProduct(created) }, 201);
   }

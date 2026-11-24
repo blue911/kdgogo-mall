@@ -8,8 +8,7 @@ export function json(data, status = 200) {
 }
 
 export function adminPassword(env) {
-  // 演示项目默认密码 orange2026；正式使用请在 Cloudflare 后台
-  // orange-mall 项目设置中添加环境变量 ADMIN_PASSWORD 覆盖它。
+  // 正式使用请在 Cloudflare 后台项目设置中添加环境变量 ADMIN_PASSWORD 覆盖默认密码。
   return env.ADMIN_PASSWORD || "orange2026";
 }
 
@@ -45,6 +44,17 @@ export const DEFAULT_PRODUCTS = [
     feats:["三层实木搁板 + 金属支架，稳固承重","免安装设计，开箱即用","原木纹理，适配多种家居风格"], sort:8 }
 ];
 
+// 后续版本新增的列：首次运行时自动补到已有数据库，避免老库报错
+const EXTRA_COLUMNS = [
+  ["stock", "INTEGER NOT NULL DEFAULT 100"],
+  ["brand", "TEXT NOT NULL DEFAULT ''"],
+  ["model", "TEXT NOT NULL DEFAULT ''"],
+  ["original_price", "REAL NOT NULL DEFAULT 0"],
+  ["images", "TEXT NOT NULL DEFAULT '[]'"],
+  ["free_shipping", "INTEGER NOT NULL DEFAULT 1"],
+  ["shipping_fee", "REAL NOT NULL DEFAULT 0"]
+];
+
 export async function ensureDb(env) {
   // 建表；表为空时写入默认商品（首次访问自动初始化）
   await env.DB.prepare(`CREATE TABLE IF NOT EXISTS products (
@@ -61,6 +71,16 @@ export async function ensureDb(env) {
     on_sale INTEGER NOT NULL DEFAULT 1,
     sort INTEGER NOT NULL DEFAULT 0
   )`).run();
+
+  // 老库平滑迁移：补齐新增列
+  const existing = await env.DB.prepare("PRAGMA table_info(products)").all();
+  const names = new Set((existing.results || []).map(c => c.name));
+  for (const [col, def] of EXTRA_COLUMNS) {
+    if (!names.has(col)) {
+      await env.DB.prepare(`ALTER TABLE products ADD COLUMN ${col} ${def}`).run();
+    }
+  }
+
   const row = await env.DB.prepare("SELECT COUNT(*) AS n FROM products").first();
   if (row && row.n === 0) {
     const stmts = DEFAULT_PRODUCTS.map(p => env.DB.prepare(
@@ -70,10 +90,16 @@ export async function ensureDb(env) {
   }
 }
 
+function parseJsonArray(v) {
+  let arr = [];
+  try { arr = JSON.parse(v || "[]"); } catch (e) { arr = []; }
+  return Array.isArray(arr) ? arr : [];
+}
+
 export function rowToProduct(r) {
-  let feats = [];
-  try { feats = JSON.parse(r.feats || "[]"); } catch (e) { feats = []; }
-  if (!Array.isArray(feats)) feats = [];
+  let feats = parseJsonArray(r.feats);
+  let images = parseJsonArray(r.images);
+  if (!images.length && r.image) images = [r.image];
   return {
     id: r.id,
     name: r.name,
@@ -82,18 +108,31 @@ export function rowToProduct(r) {
     price: r.price,
     rating: r.rating,
     isNew: !!r.isNew,
-    image: r.image || "",
+    image: r.image || (images[0] || ""),
     description: r.description || "",
     feats,
+    images,
     on_sale: !!r.on_sale,
-    sort: r.sort || 0
+    sort: r.sort || 0,
+    stock: typeof r.stock === "number" ? r.stock : 100,
+    brand: r.brand || "",
+    model: r.model || "",
+    original_price: r.original_price || 0,
+    free_shipping: !!r.free_shipping,
+    shipping_fee: r.shipping_fee || 0
   };
 }
 
 // 兼容后台表单与前端两种字段命名（img/desc/cat 与 image/description/category）
 export function normalizeProduct(b) {
-  const category = String(b.category || b.cat || "digital") === "life" ? "life" : "digital";
-  const catName = String(b.catName || "").trim() || (category === "life" ? "生活好物" : "数码");
+  const rawCat = String(b.category || b.cat || "digital").trim();
+  const category = rawCat.toLowerCase().replace(/\s+/g, "_").replace(/[^\w一-龥-]/g, "") || "digital";
+  const catName = String(b.catName || "").trim() || rawCat || "数码";
+  const images = Array.isArray(b.images)
+    ? b.images.map(f => String(f).trim()).filter(Boolean)
+    : [];
+  const mainImage = String(b.image || b.img || "").trim();
+  if (!images.length && mainImage) images.push(mainImage);
   return {
     name: String(b.name ?? "").trim(),
     category,
@@ -101,11 +140,18 @@ export function normalizeProduct(b) {
     price: Number(b.price),
     rating: (b.rating === undefined || b.rating === null || b.rating === "") ? 4.8 : Number(b.rating),
     isNew: b.isNew ? 1 : 0,
-    image: String(b.image || b.img || "").trim(),
+    image: images[0] || mainImage,
     description: String(b.description || b.desc || "").trim(),
     feats: Array.isArray(b.feats) ? b.feats.map(f => String(f).trim()).filter(Boolean) : [],
+    images,
     on_sale: (b.on_sale === undefined || b.on_sale === null) ? 1 : (b.on_sale ? 1 : 0),
-    sort: Number(b.sort) || 0
+    sort: Number(b.sort) || 0,
+    stock: Math.max(0, Math.round(Number(b.stock ?? 100)) || 0),
+    brand: String(b.brand ?? "").trim(),
+    model: String(b.model ?? "").trim(),
+    original_price: Math.max(0, Number(b.original_price) || 0),
+    free_shipping: b.free_shipping === false ? 0 : 1,
+    shipping_fee: Math.max(0, Number(b.shipping_fee) || 0)
   };
 }
 
@@ -113,5 +159,7 @@ export function validateProduct(p) {
   if (!p.name) return "商品名称不能为空";
   if (!(p.price > 0)) return "价格必须大于 0";
   if (isNaN(p.rating) || p.rating < 0 || p.rating > 5) return "评分应在 0–5 之间";
+  if (isNaN(p.stock) || p.stock < 0) return "库存数量不能为负数";
+  if (p.original_price && p.original_price < p.price) return "原价不能低于售价";
   return null;
 }

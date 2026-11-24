@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>橙屿商城 · 管理后台</title>
-<meta name="description" content="橙屿商城管理后台：商品新增、编辑、上下架，数据存储于 Cloudflare D1。">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23E84E0A'/><text x='32' y='45' font-size='34' text-anchor='middle' fill='%23fff' font-family='serif'>屿</text></svg>">
+<title>KDGOGO商城 · 管理后台</title>
+<meta name="description" content="KDGOGO商城管理后台：商品新增、编辑、上下架，数据存储于 Cloudflare D1。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23E84E0A'/><text x='32' y='45' font-size='34' text-anchor='middle' fill='%23fff' font-family='serif'>K</text></svg>">
 <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap">
 <style>
 :root{
@@ -56,6 +56,7 @@ a{color:inherit;text-decoration:none}
 .check-row{display:flex;gap:18px;flex-wrap:wrap}
 .check-row label{display:flex;align-items:center;gap:7px;font-size:14px;color:var(--ink-2);cursor:pointer}
 .check-row input{width:16px;height:16px;accent-color:var(--brand)}
+.field input:disabled{background:var(--warm);color:var(--muted)}
 
 /* 主视图 */
 .page{padding:34px 0 64px}
@@ -72,10 +73,11 @@ a{color:inherit;text-decoration:none}
 table{width:100%;border-collapse:collapse;table-layout:fixed}
 colgroup col.c-img{width:64px}
 colgroup col.c-name{width:auto}
-colgroup col.c-cat{width:74px}
-colgroup col.c-price{width:76px}
-colgroup col.c-rate{width:64px}
-colgroup col.c-state{width:86px}
+colgroup col.c-cat{width:80px}
+colgroup col.c-brand{width:120px}
+colgroup col.c-price{width:80px}
+colgroup col.c-stock{width:70px}
+colgroup col.c-state{width:92px}
 colgroup col.c-ops{width:118px}
 th,td{padding:12px 10px;text-align:left;vertical-align:middle;border-bottom:1px solid var(--line);font-size:13px}
 th{background:var(--warm);font-weight:700;color:var(--ink-2);font-size:12px}
@@ -83,9 +85,14 @@ tbody tr:last-child td{border-bottom:none}
 tbody tr:hover{background:#FDFAF5}
 td img.thumb{width:52px;height:52px;border-radius:9px;object-fit:cover;background:var(--warm);border:1px solid var(--line)}
 .t-name{font-weight:600}
+.t-sub{font-size:11px;color:var(--muted);margin-top:2px}
 .tag{display:inline-block;font-size:11px;padding:3px 9px;border-radius:999px;background:var(--warm);color:var(--ink-2);margin-right:4px}
 .tag.new{background:var(--brand-soft);color:var(--brand-deep)}
 .tag.off{background:#EFEDE7;color:var(--muted)}
+.stock{display:inline-block;font-size:11px;padding:3px 9px;border-radius:999px}
+.stock.ok{background:#E7F2EB;color:var(--ok)}
+.stock.low{background:var(--brand-soft);color:var(--brand-deep)}
+.stock.out{background:#EFEDE7;color:var(--muted)}
 .ops{display:flex;gap:6px;justify-content:flex-end}
 .empty-state{text-align:center;padding:56px 20px;color:var(--muted)}
 .empty-state svg{width:40px;height:40px;color:#CFC8BA;margin:0 auto 12px;display:block}
@@ -94,7 +101,7 @@ td img.thumb{width:52px;height:52px;border-radius:9px;object-fit:cover;backgroun
 /* 弹窗 */
 .overlay{position:fixed;inset:0;background:rgba(33,32,30,.45);z-index:60;display:none;align-items:flex-start;justify-content:center;padding:6vh 20px;overflow:auto}
 .overlay.show{display:flex}
-.modal{background:#fff;border-radius:18px;width:100%;max-width:560px;padding:26px 26px 22px;box-shadow:var(--shadow)}
+.modal{background:#fff;border-radius:18px;width:100%;max-width:600px;padding:26px 26px 22px;box-shadow:var(--shadow)}
 .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
 .modal-head h2{font-family:var(--font-display);font-size:20px;font-weight:900}
 .modal-close{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:background .15s,color .15s}
@@ -106,6 +113,7 @@ td img.thumb{width:52px;height:52px;border-radius:9px;object-fit:cover;backgroun
 .pick-imgs img{width:44px;height:44px;object-fit:cover;border-radius:8px;border:2px solid var(--line);cursor:pointer;transition:border .15s}
 .pick-imgs img:hover,.pick-imgs img.sel{border-color:var(--brand)}
 .preview{width:86px;height:86px;object-fit:cover;border-radius:10px;border:1px solid var(--line);background:var(--warm);margin-top:8px;display:none}
+.price-old{color:var(--muted);text-decoration:line-through;font-size:12px}
 
 /* Toast */
 .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;font-size:14px;padding:11px 20px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:90}
@@ -118,7 +126,7 @@ td img.thumb{width:52px;height:52px;border-radius:9px;object-fit:cover;backgroun
   .form-grid{grid-template-columns:1fr}
   .page{padding:22px 0 48px}
   .table-wrap{overflow-x:auto}
-  table{min-width:640px}
+  table{min-width:720px}
 }
 </style>
 </head>
@@ -127,8 +135,8 @@ td img.thumb{width:52px;height:52px;border-radius:9px;object-fit:cover;backgroun
 <header class="site-header">
   <div class="container header-inner">
     <div class="brand">
-      <svg viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#E84E0A"/><text x="32" y="45" font-size="34" text-anchor="middle" fill="#fff" font-family="serif">屿</text></svg>
-      橙屿商城 · 管理后台
+      <svg viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#E84E0A"/><text x="32" y="45" font-size="34" text-anchor="middle" fill="#fff" font-family="serif">K</text></svg>
+      KDGOGO商城 · 管理后台
     </div>
     <div class="header-right">
       <span class="header-count hide" id="countLabel"></span>
@@ -146,7 +154,6 @@ td img.thumb{width:52px;height:52px;border-radius:9px;object-fit:cover;backgroun
     <div class="field">
       <label for="passwordInput">管理密码</label>
       <input type="password" id="passwordInput" autocomplete="current-password" placeholder="请输入密码">
-      <div class="hint">演示默认密码：orange2026（可在 Cloudflare 环境变量 ADMIN_PASSWORD 中修改）</div>
     </div>
     <button class="btn btn-primary" type="submit" style="width:100%;justify-content:center">进入后台</button>
   </form>
@@ -165,10 +172,10 @@ td img.thumb{width:52px;height:52px;border-radius:9px;object-fit:cover;backgroun
   <div class="table-wrap">
     <table id="productTable">
       <colgroup>
-        <col class="c-img"><col class="c-name"><col class="c-cat"><col class="c-price"><col class="c-rate"><col class="c-state"><col class="c-ops">
+        <col class="c-img"><col class="c-name"><col class="c-cat"><col class="c-brand"><col class="c-price"><col class="c-stock"><col class="c-state"><col class="c-ops">
       </colgroup>
       <thead>
-        <tr><th>图片</th><th>名称</th><th>分类</th><th>价格</th><th>评分</th><th>状态</th><th style="text-align:right">操作</th></tr>
+        <tr><th>图片</th><th>名称</th><th>分类</th><th>品牌/型号</th><th>价格</th><th>库存</th><th>状态</th><th style="text-align:right">操作</th></tr>
       </thead>
       <tbody id="tbody"></tbody>
     </table>
@@ -195,29 +202,56 @@ td img.thumb{width:52px;height:52px;border-radius:9px;object-fit:cover;backgroun
           <input type="text" id="fName" maxlength="40" placeholder="如：轻羽降噪耳机 Pro">
         </div>
         <div class="field">
-          <label for="fCat">分类</label>
-          <select id="fCat">
-            <option value="digital">数码</option>
-            <option value="life">生活好物</option>
-          </select>
+          <label for="fCat">分类（可直接填写新分类）</label>
+          <input type="text" id="fCat" list="catList" maxlength="20" placeholder="如：数码 / 生活好物">
+          <datalist id="catList"></datalist>
         </div>
         <div class="field">
           <label for="fPrice">价格（元）*</label>
           <input type="number" id="fPrice" min="1" step="1" placeholder="399">
         </div>
         <div class="field">
+          <label for="fBrand">品牌</label>
+          <input type="text" id="fBrand" maxlength="30" placeholder="如：KDGOGO">
+        </div>
+        <div class="field">
+          <label for="fModel">型号 / 规格</label>
+          <input type="text" id="fModel" maxlength="30" placeholder="如：Earbuds Pro">
+        </div>
+        <div class="field">
+          <label for="fOriginal">原价（划线价，可选）</label>
+          <input type="number" id="fOriginal" min="0" step="1" placeholder="0 表示不显示原价">
+        </div>
+        <div class="field">
+          <label for="fStock">库存数量</label>
+          <input type="number" id="fStock" min="0" step="1" placeholder="100">
+        </div>
+        <div class="field">
           <label for="fRating">评分（0–5）</label>
           <input type="number" id="fRating" min="0" max="5" step="0.1" placeholder="4.8">
         </div>
-        <div class="field check-row" style="align-items:flex-end">
+        <div class="field">
+          <label for="fSort">排序权重（数字越小越靠前）</label>
+          <input type="number" id="fSort" min="0" step="1" placeholder="0">
+        </div>
+        <div class="field check-row full" style="align-items:flex-end">
           <label><input type="checkbox" id="fNew"> 新品</label>
           <label><input type="checkbox" id="fOnSale" checked> 上架</label>
+          <label><input type="checkbox" id="fFreeShip" checked> 包邮</label>
         </div>
         <div class="field full">
-          <label for="fImg">图片地址</label>
+          <label for="fShipFee">运费（元，未包邮时生效）</label>
+          <input type="number" id="fShipFee" min="0" step="1" placeholder="0">
+        </div>
+        <div class="field full">
+          <label for="fImg">主图地址</label>
           <input type="text" id="fImg" placeholder="assets/p01-earbuds.jpg 或 https://…">
           <div class="pick-imgs" id="pickImgs"></div>
           <img class="preview" id="imgPreview" alt="图片预览">
+        </div>
+        <div class="field full">
+          <label for="fImages">图集（每行一条，可选；第一张作为主图）</label>
+          <textarea id="fImages" placeholder="https://…/img2.jpg&#10;https://…/img3.jpg"></textarea>
         </div>
         <div class="field full">
           <label for="fDesc">一句话描述</label>
@@ -280,7 +314,7 @@ $("#loginForm").addEventListener("submit", async (e) => {
     const { status, data } = await api("/api/login", { method: "POST", body: JSON.stringify({ password }) });
     if (status === 200 && data.ok) {
       token = data.token;
-      try { sessionStorage.setItem("orange-admin-token", token); } catch (err) {}
+      try { sessionStorage.setItem("kdgogo-admin-token", token); } catch (err) {}
       enterMain();
     } else {
       toast((data && data.error) || "密码错误");
@@ -293,7 +327,7 @@ $("#loginForm").addEventListener("submit", async (e) => {
 
 function logout(){
   token = "";
-  try { sessionStorage.removeItem("orange-admin-token"); } catch (e) {}
+  try { sessionStorage.removeItem("kdgogo-admin-token"); } catch (e) {}
   mainView.classList.add("hide");
   loginView.classList.remove("hide");
   $("#logoutBtn").classList.add("hide");
@@ -320,7 +354,20 @@ async function loadList(){
   }
   if (!data || !data.ok) { toast("商品加载失败"); return; }
   products = data.products || [];
+  renderCats();
   renderRows();
+}
+
+function renderCats(){
+  const names = [...new Set(products.map(p => p.catName).filter(Boolean))];
+  $("#catList").innerHTML = names.map(n => `<option value="${esc(n)}"></option>`).join("");
+}
+
+function stockTag(stock){
+  const s = Number(stock ?? 100);
+  if (s <= 0) return '<span class="stock out">缺货</span>';
+  if (s <= 20) return `<span class="stock low">紧张 ${s}</span>`;
+  return `<span class="stock ok">有货 ${s}</span>`;
 }
 
 function renderRows(){
@@ -332,12 +379,16 @@ function renderRows(){
     if (p.isNew) tags.push('<span class="tag new">新品</span>');
     if (!p.on_sale) tags.push('<span class="tag off">已下架</span>');
     if (!tags.length) tags.push('<span class="tag">在售</span>');
+    const sub = [p.brand, p.model].filter(Boolean).join(" · ");
+    const old = p.original_price && p.original_price > p.price
+      ? `<div class="price-old">¥${p.original_price}</div>` : "";
     return `<tr data-id="${p.id}">
       <td>${p.image ? `<img class="thumb" src="${esc(p.image)}" alt="">` : '<div style="height:52px"></div>'}</td>
-      <td class="t-name">${esc(p.name)}</td>
+      <td class="t-name">${esc(p.name)}${sub ? `<div class="t-sub">${esc(sub)}</div>` : ""}</td>
       <td>${esc(p.catName)}</td>
-      <td>¥${p.price}</td>
-      <td>${p.rating.toFixed(1)}</td>
+      <td>${esc([p.brand, p.model].filter(Boolean).join(" / ") || "—")}</td>
+      <td>¥${p.price}${old}</td>
+      <td>${stockTag(p.stock)}</td>
       <td>${tags.join("")}</td>
       <td><div class="ops">
         <button class="btn btn-ghost btn-sm" data-edit="${p.id}">编辑</button>
@@ -374,19 +425,33 @@ function openEdit(id){
   const p = isEdit ? products.find(x => x.id === id) : null;
   $("#fId").value = p ? p.id : "";
   $("#fName").value = p ? p.name : "";
-  $("#fCat").value = p ? p.category : "digital";
+  $("#fCat").value = p ? p.catName : "";
   $("#fPrice").value = p ? p.price : "";
+  $("#fBrand").value = p ? (p.brand || "") : "";
+  $("#fModel").value = p ? (p.model || "") : "";
+  $("#fOriginal").value = p ? (p.original_price || 0) : 0;
+  $("#fStock").value = p ? (p.stock ?? 100) : 100;
   $("#fRating").value = p ? p.rating : "4.8";
+  $("#fSort").value = p ? (p.sort || 0) : 0;
   $("#fNew").checked = p ? !!p.isNew : false;
   $("#fOnSale").checked = p ? !!p.on_sale : true;
+  $("#fFreeShip").checked = p ? p.free_shipping !== false : true;
+  $("#fShipFee").value = p ? (p.shipping_fee || 0) : 0;
   $("#fImg").value = p ? (p.image || "") : "";
+  $("#fImages").value = p && p.images && p.images.length ? p.images.join("\n") : "";
   $("#fDesc").value = p ? (p.description || "") : "";
   $("#fFeats").value = p ? (p.feats || []).join("\n") : "";
+  syncShipFee();
   buildPicks(p ? p.image : "");
   updatePreview();
   $("#overlay").classList.add("show");
   setTimeout(() => $("#fName").focus(), 60);
 }
+
+function syncShipFee(){
+  $("#fShipFee").disabled = $("#fFreeShip").checked;
+}
+$("#fFreeShip").addEventListener("change", syncShipFee);
 
 function buildPicks(cur){
   const box = $("#pickImgs");
@@ -419,19 +484,31 @@ function closeModal(){ $("#overlay").classList.remove("show"); }
 $("#productForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const id = $("#fId").value;
+  const images = $("#fImages").value.split("\n").map(s => s.trim()).filter(Boolean);
+  const mainImg = $("#fImg").value.trim();
+  if (!images.length && mainImg) images.push(mainImg);
   const body = {
     name: $("#fName").value.trim(),
-    category: $("#fCat").value,
-    catName: $("#fCat").value === "life" ? "生活好物" : "数码",
+    category: $("#fCat").value.trim(),
+    catName: $("#fCat").value.trim(),
     price: Number($("#fPrice").value),
+    brand: $("#fBrand").value.trim(),
+    model: $("#fModel").value.trim(),
+    original_price: Number($("#fOriginal").value) || 0,
+    stock: Math.max(0, Math.round(Number($("#fStock").value)) || 0),
     rating: Number($("#fRating").value || 4.8),
+    sort: Number($("#fSort").value) || 0,
     isNew: $("#fNew").checked,
     on_sale: $("#fOnSale").checked,
-    image: $("#fImg").value.trim(),
+    free_shipping: $("#fFreeShip").checked,
+    shipping_fee: Number($("#fShipFee").value) || 0,
+    image: images[0] || mainImg,
+    images,
     description: $("#fDesc").value.trim(),
     feats: $("#fFeats").value.split("\n").map(s => s.trim()).filter(Boolean)
   };
   if (!body.name) { toast("请填写商品名称"); return; }
+  if (!body.catName) { toast("请填写分类"); return; }
   if (!(body.price > 0)) { toast("请填写正确的价格"); return; }
   const btn = $("#saveBtn");
   btn.disabled = true; btn.textContent = "保存中…";
@@ -454,7 +531,7 @@ $("#productForm").addEventListener("submit", async (e) => {
 
 /* ===== 启动 ===== */
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
-try { token = sessionStorage.getItem("orange-admin-token") || ""; } catch (e) { token = ""; }
+try { token = sessionStorage.getItem("kdgogo-admin-token") || sessionStorage.getItem("orange-admin-token") || ""; } catch (e) { token = ""; }
 if (token) enterMain();
 </script>
 </body>
