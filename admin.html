@@ -28,10 +28,11 @@ a{color:inherit;text-decoration:none}
 /* 顶栏 */
 .site-header{position:sticky;top:0;z-index:40;background:var(--paper);border-bottom:1px solid var(--line)}
 .header-inner{display:flex;align-items:center;gap:16px;height:60px}
-.brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:16px}
+.brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:16px;white-space:nowrap;min-width:0}
 .brand svg{width:26px;height:26px;flex:none}
-.header-right{margin-left:auto;display:flex;align-items:center;gap:10px}
-.header-count{font-size:13px;color:var(--muted)}
+.brand span{overflow:hidden;text-overflow:ellipsis}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:10px;flex:none}
+.header-count{font-size:13px;color:var(--muted);white-space:nowrap}
 .btn{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;padding:9px 16px;border-radius:10px;transition:background .15s,transform .15s}
 .btn-primary{background:var(--brand);color:#fff}
 .btn-primary:hover{background:var(--brand-deep)}
@@ -60,6 +61,9 @@ a{color:inherit;text-decoration:none}
 
 /* 多语言译文块 */
 .i18n-block{border:1px dashed var(--line);border-radius:12px;padding:14px 16px;background:#FDFCF9}
+.i18n-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.i18n-head label{font-size:13px;font-weight:600;color:var(--ink-2)}
+#translateAllBtn{white-space:nowrap}
 .i18n-tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
 .i18n-tab{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:600;cursor:pointer;color:var(--ink-2)}
 .i18n-tab.active{background:var(--brand);color:#fff;border-color:var(--brand)}
@@ -143,6 +147,12 @@ td img.thumb{width:52px;height:52px;border-radius:9px;object-fit:cover;backgroun
 .hide{display:none!important}
 
 @media (max-width:720px){
+  .header-inner{gap:10px;height:54px}
+  .brand{font-size:14px;gap:7px}
+  .brand svg{width:22px;height:22px}
+  .header-count{display:none}
+  .header-right{gap:8px}
+  .btn-sm{padding:6px 10px;font-size:12px}
   .form-grid{grid-template-columns:1fr}
   .page{padding:22px 0 48px}
   .table-wrap{overflow-x:auto}
@@ -156,7 +166,7 @@ td img.thumb{width:52px;height:52px;border-radius:9px;object-fit:cover;backgroun
   <div class="container header-inner">
     <div class="brand">
       <svg viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#E84E0A"/><text x="32" y="45" font-size="34" text-anchor="middle" fill="#fff" font-family="serif">K</text></svg>
-      KDGOGO商城 · 管理后台
+      <span>KDGOGO商城 · 管理后台</span>
     </div>
     <div class="header-right">
       <span class="header-count hide" id="countLabel"></span>
@@ -284,47 +294,12 @@ td img.thumb{width:52px;height:52px;border-radius:9px;object-fit:cover;backgroun
         </div>
 
         <div class="field full i18n-block">
-          <label>多语言译文（可选；留空的语种前台自动回退中文）</label>
-          <div class="i18n-tabs" id="i18nTabs">
-            <button type="button" class="i18n-tab active" data-ln="en">English</button>
-            <button type="button" class="i18n-tab" data-ln="ru">Русский</button>
+          <div class="i18n-head">
+            <label>多语言译文（可选；留空的语种前台自动回退中文）</label>
+            <button type="button" class="btn btn-primary btn-sm" id="translateAllBtn">一键翻译全部语种</button>
           </div>
-
-          <div class="i18n-pane" data-ln="en">
-            <div class="field">
-              <label for="tr-en-name">商品名称（英文）</label>
-              <input type="text" id="tr-en-name" maxlength="40">
-            </div>
-            <div class="field full">
-              <label for="tr-en-desc">一句话描述（英文）</label>
-              <input type="text" id="tr-en-desc" maxlength="60">
-            </div>
-            <div class="field full">
-              <label for="tr-en-feats">卖点（英文，每行一条）</label>
-              <textarea id="tr-en-feats" placeholder="Bluetooth 5.3 low latency&#10;8-hour battery"></textarea>
-            </div>
-            <div class="i18n-actions">
-              <button type="button" class="btn btn-ghost btn-sm" data-translate="en">机翻预填 English</button>
-            </div>
-          </div>
-
-          <div class="i18n-pane" data-ln="ru" hidden>
-            <div class="field">
-              <label for="tr-ru-name">商品名称（俄文）</label>
-              <input type="text" id="tr-ru-name" maxlength="40">
-            </div>
-            <div class="field full">
-              <label for="tr-ru-desc">一句话描述（俄文）</label>
-              <input type="text" id="tr-ru-desc" maxlength="60">
-            </div>
-            <div class="field full">
-              <label for="tr-ru-feats">卖点（俄文，每行一条）</label>
-              <textarea id="tr-ru-feats" placeholder="Bluetooth 5.3, низкая задержка&#10;Автономность 8 часов"></textarea>
-            </div>
-            <div class="i18n-actions">
-              <button type="button" class="btn btn-ghost btn-sm" data-translate="ru">机翻预填 Русский</button>
-            </div>
-          </div>
+          <div class="i18n-tabs" id="i18nTabs"></div>
+          <div id="i18nPanes"></div>
         </div>
       </div>
       <div class="modal-foot">
@@ -483,7 +458,45 @@ async function removeProduct(id){
 }
 
 /* ===== 新增 / 编辑 ===== */
-const TR_LANGS = ["en", "ru"];
+const TR_LANGS = [
+  { code:"en", label:"English" },
+  { code:"ru", label:"Русский" },
+  { code:"es", label:"Español" },
+  { code:"ar", label:"العربية" },
+  { code:"fr", label:"Français" },
+  { code:"pt", label:"Português" },
+  { code:"de", label:"Deutsch" },
+  { code:"id", label:"Bahasa Indonesia" },
+  { code:"ja", label:"日本語" },
+  { code:"ko", label:"한국어" },
+  { code:"tr", label:"Türkçe" }
+];
+const TR_CODES = TR_LANGS.map(l => l.code);
+
+function buildI18nPanel(){
+  $("#i18nTabs").innerHTML = TR_LANGS.map((l,i) =>
+    `<button type="button" class="i18n-tab${i===0?" active":""}" data-ln="${l.code}">${l.label}</button>`
+  ).join("");
+  $("#i18nPanes").innerHTML = TR_LANGS.map((l,i) => `
+    <div class="i18n-pane" data-ln="${l.code}"${i===0?"":" hidden"}>
+      <div class="field">
+        <label for="tr-${l.code}-name">商品名称（${l.label}）</label>
+        <input type="text" id="tr-${l.code}-name" maxlength="40">
+      </div>
+      <div class="field full">
+        <label for="tr-${l.code}-desc">一句话描述（${l.label}）</label>
+        <input type="text" id="tr-${l.code}-desc" maxlength="60">
+      </div>
+      <div class="field full">
+        <label for="tr-${l.code}-feats">卖点（${l.label}，每行一条）</label>
+        <textarea id="tr-${l.code}-feats"></textarea>
+      </div>
+      <div class="i18n-actions">
+        <button type="button" class="btn btn-ghost btn-sm" data-translate="${l.code}">机翻预填 ${l.label}</button>
+      </div>
+    </div>`).join("");
+}
+
 function fillTr(ln, block){
   block = block || {};
   $("#tr-" + ln + "-name").value = block.name || "";
@@ -492,7 +505,7 @@ function fillTr(ln, block){
 }
 function collectI18n(){
   const out = {};
-  TR_LANGS.forEach(ln => {
+  TR_CODES.forEach(ln => {
     const name = $("#tr-" + ln + "-name").value.trim();
     const description = $("#tr-" + ln + "-desc").value.trim();
     const feats = $("#tr-" + ln + "-feats").value.split("\n").map(s => s.trim()).filter(Boolean);
@@ -505,6 +518,24 @@ function collectI18n(){
   return out;
 }
 
+function sourceText(){
+  return {
+    name: $("#fName").value.trim(),
+    description: $("#fDesc").value.trim(),
+    feats: $("#fFeats").value.split("\n").map(s => s.trim()).filter(Boolean)
+  };
+}
+function applyTr(ln, r){
+  $("#tr-" + ln + "-name").value = r.name || "";
+  $("#tr-" + ln + "-desc").value = r.description || "";
+  $("#tr-" + ln + "-feats").value = Array.isArray(r.feats) ? r.feats.join("\n") : "";
+}
+async function translateOne(ln, text){
+  const { status, data } = await api("/api/translate", { method:"POST", body: JSON.stringify({ target: ln, text }) });
+  if (status === 200 && data.ok && data.result){ applyTr(ln, data.result); return true; }
+  return false;
+}
+
 /* 译文选项卡切换 */
 $("#i18nTabs").addEventListener("click", e => {
   const btn = e.target.closest(".i18n-tab");
@@ -513,33 +544,42 @@ $("#i18nTabs").addEventListener("click", e => {
   document.querySelectorAll(".i18n-pane").forEach(p => { p.hidden = p.dataset.ln !== btn.dataset.ln; });
 });
 
-/* 机翻预填：生成草稿，人工核对后随商品保存 */
+/* 单语种机翻预填：生成草稿，人工核对后随商品保存 */
 document.addEventListener("click", async e => {
   const btn = e.target.closest("[data-translate]");
   if (!btn) return;
   const ln = btn.dataset.translate;
-  const text = {
-    name: $("#fName").value.trim(),
-    description: $("#fDesc").value.trim(),
-    feats: $("#fFeats").value.split("\n").map(s => s.trim()).filter(Boolean)
-  };
+  const text = sourceText();
   if (!text.name && !text.description && !text.feats.length){ toast("请先填写中文名称 / 描述 / 卖点"); return; }
   const old = btn.textContent;
   btn.disabled = true; btn.textContent = "翻译中…";
   try {
-    const { status, data } = await api("/api/translate", { method: "POST", body: JSON.stringify({ target: ln, text }) });
-    if (status === 200 && data.ok && data.result){
-      const r = data.result;
-      $("#tr-" + ln + "-name").value = r.name || "";
-      $("#tr-" + ln + "-desc").value = r.description || "";
-      $("#tr-" + ln + "-feats").value = Array.isArray(r.feats) ? r.feats.join("\n") : "";
-      toast("已生成译文草稿，请核对后保存");
-    } else {
-      toast((data && data.error) || "机翻失败，可手工填写");
-    }
+    const ok = await translateOne(ln, text);
+    toast(ok ? "已生成译文草稿，请核对后保存" : "机翻失败，可手工填写");
   } catch (err){
     toast("机翻服务暂不可用，可手工填写");
   }
+  btn.disabled = false; btn.textContent = old;
+});
+
+/* 一键翻译全部语种：3 路并发，逐语种回填草稿 */
+$("#translateAllBtn").addEventListener("click", async () => {
+  const text = sourceText();
+  if (!text.name && !text.description && !text.feats.length){ toast("请先填写中文名称 / 描述 / 卖点"); return; }
+  const btn = $("#translateAllBtn");
+  const old = btn.textContent;
+  btn.disabled = true; btn.textContent = "翻译中…";
+  let ok = 0, fail = 0;
+  const queue = TR_CODES.slice();
+  const workers = Array.from({ length: 3 }, async () => {
+    while (queue.length){
+      const ln = queue.shift();
+      try { (await translateOne(ln, text)) ? ok++ : fail++; }
+      catch (err){ fail++; }
+    }
+  });
+  await Promise.all(workers);
+  toast(fail ? `已生成 ${ok} 种译文，${fail} 种失败，可手工填写` : "已生成全部语种译文草稿，请核对后保存");
   btn.disabled = false; btn.textContent = old;
 });
 
@@ -567,7 +607,7 @@ function openEdit(id){
   gallery = p && p.images && p.images.length ? p.images.slice() : (p && p.image ? [p.image] : []);
   $("#fDesc").value = p ? (p.description || "") : "";
   $("#fFeats").value = p ? (p.feats || []).join("\n") : "";
-  ["en", "ru"].forEach(ln => fillTr(ln, p && p.i18n ? p.i18n[ln] : null));
+  TR_CODES.forEach(ln => fillTr(ln, p && p.i18n ? p.i18n[ln] : null));
   syncShipFee();
   buildPicks(p ? p.image : "");
   updatePreview();
@@ -725,6 +765,7 @@ $("#productForm").addEventListener("submit", async (e) => {
 });
 
 /* ===== 启动 ===== */
+buildI18nPanel();
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
 try { token = sessionStorage.getItem("kdgogo-admin-token") || sessionStorage.getItem("orange-admin-token") || ""; } catch (e) { token = ""; }
 if (token) enterMain();

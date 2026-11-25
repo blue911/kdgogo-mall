@@ -26,11 +26,11 @@ a{color:inherit;text-decoration:none}
 :focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 
 /* ===== 顶栏（与首页统一） ===== */
-.site-header{position:sticky;top:0;z-index:40;background:var(--paper);border-bottom:1px solid var(--line)}
+.site-header{position:sticky;top:0;z-index:40;background:var(--paper);border-bottom:none}
 .header-top{display:flex;align-items:center;gap:24px;height:60px}
 .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;letter-spacing:.5px;white-space:nowrap;flex:none}
 .brand svg{width:30px;height:30px;flex:none}
-.main-nav{display:flex;align-items:center;gap:8px;height:54px;border-top:1px solid var(--line)}
+.main-nav{display:flex;align-items:center;gap:8px;height:54px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .nav-link{padding:15px 16px;border-radius:0;font-size:15px;color:var(--ink-2);white-space:nowrap;flex:none;border-bottom:2px solid transparent;text-align:center;transition:color .15s,border-color .15s,background .15s}
 .nav-link:hover{color:var(--brand)}
 .nav-link.active{color:var(--brand);font-weight:700;border-bottom-color:var(--brand)}

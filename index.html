@@ -36,11 +36,11 @@ a{color:inherit;text-decoration:none}
 :focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 
 /* ============ 顶栏 ============ */
-.site-header{position:sticky;top:0;z-index:40;background:var(--paper);border-bottom:1px solid var(--line)}
+.site-header{position:sticky;top:0;z-index:40;background:var(--paper);border-bottom:none}
 .header-top{display:flex;align-items:center;gap:24px;height:60px}
 .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;letter-spacing:.5px;white-space:nowrap;flex:none}
 .brand svg{width:30px;height:30px;flex:none}
-.main-nav{display:flex;align-items:center;gap:8px;height:54px;border-top:1px solid var(--line)}
+.main-nav{display:flex;align-items:center;gap:8px;height:54px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .nav-link{padding:15px 16px;border-radius:0;font-size:15px;color:var(--ink-2);white-space:nowrap;flex:none;border-bottom:2px solid transparent;text-align:center;transition:color .15s,border-color .15s,background .15s}
 .nav-link:hover{color:var(--brand)}
 .nav-link.active{color:var(--brand);font-weight:700;border-bottom-color:var(--brand)}
@@ -52,8 +52,6 @@ a{color:inherit;text-decoration:none}
 .cart-btn{position:relative;display:flex;align-items:center;justify-content:center;width:40px;height:40px;border:1px solid var(--line);border-radius:10px;background:#fff;transition:border .15s,color .15s}
 .cart-btn:hover{border-color:var(--brand);color:var(--brand)}
 .cart-btn svg{width:20px;height:20px}
-.admin-link{font-size:13px;color:var(--muted);padding:6px 10px;border-radius:8px;white-space:nowrap;flex:none;transition:color .15s,background .15s}
-.admin-link:hover{color:var(--brand);background:var(--brand-soft)}
 .cart-badge{position:absolute;top:-6px;right:-6px;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:var(--brand);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:transform .15s}
 .cart-badge.hide{display:none}
 .lang-select{height:38px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:0 10px;font-size:13px;color:var(--ink-2);cursor:pointer;white-space:nowrap;flex:none}
@@ -234,7 +232,6 @@ a{color:inherit;text-decoration:none}
   .search-box{order:0;flex:1 1 auto;flex-basis:auto;min-width:0}
   .search-box input{width:100%;min-width:0;height:42px;font-size:14px}
   .lang-select{height:42px;padding:0 4px;font-size:12px}
-  .admin-link{display:none}
   .footer-grid{grid-template-columns:1.4fr 1fr;gap:32px 28px}
 }
 @media (max-width:760px){
@@ -300,7 +297,6 @@ a{color:inherit;text-decoration:none}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1.4"/><circle cx="19" cy="21" r="1.4"/><path d="M2.5 3h2l2.6 12.4a2 2 0 0 0 2 1.6h8.7a2 2 0 0 0 2-1.6L21.5 7H6"/></svg>
         <span class="cart-badge hide" id="cartBadge">0</span>
       </button>
-      <a class="admin-link" href="admin.html" aria-label="进入管理后台" data-i18n="admin"></a>
     </div>
   </div>
   <nav class="main-nav container" aria-label="主导航">
