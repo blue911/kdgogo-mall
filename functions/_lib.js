@@ -162,6 +162,48 @@ export function rowToProduct(r) {
   };
 }
 
+/* 解析商品图集 JSON 数组 */
+function parseImgArray(v) {
+  let arr = [];
+  try { arr = JSON.parse(v || "[]"); } catch (e) { return []; }
+  return Array.isArray(arr) ? arr.map(String) : [];
+}
+
+/* 汇总当前所有商品仍在引用的图片地址（主图 + 图集） */
+export async function referencedImageSet(env) {
+  const { results } = await env.DB.prepare("SELECT image, images FROM products").all();
+  const set = new Set();
+  for (const r of results || []) {
+    if (r.image) set.add(String(r.image));
+    for (const im of parseImgArray(r.images)) if (im) set.add(String(im));
+  }
+  return set;
+}
+
+/* 清理候选图片中已无任何商品引用的本站 R2 对象；外链与 assets 静态图不处理 */
+export async function cleanupOrphanImages(env, candidates) {
+  const out = { deleted: [], skipped: [] };
+  if (!env.IMAGES) return out;
+  let refs;
+  try { refs = await referencedImageSet(env); } catch (e) { return out; }
+  const seen = new Set();
+  for (const raw of candidates || []) {
+    const url = String(raw || "").trim();
+    if (!url || seen.has(url)) continue;
+    seen.add(url);
+    if (!url.startsWith("/images/")) { out.skipped.push(url); continue; }
+    if (refs.has(url)) continue; // 仍被其他商品引用
+    const key = decodeURIComponent(url.slice("/images/".length));
+    try {
+      await env.IMAGES.delete(key);
+      out.deleted.push(url);
+    } catch (e) {
+      out.skipped.push(url);
+    }
+  }
+  return out;
+}
+
 // 兼容后台表单与前端两种字段命名（img/desc/cat 与 image/description/category）
 export function normalizeProduct(b) {
   const rawCat = String(b.category || b.cat || "digital").trim();
