@@ -53,6 +53,7 @@ KDGOGO 商城：数码与生活好物精选，支持多语言切换、分类筛�
 | sort | INTEGER | 排序权重，数字越小越靠前 |
 | isNew | INTEGER | 新品标签 1/0 |
 | on_sale | INTEGER | 上架状态 1/0 |
+| i18n | TEXT(JSON) | 各语种译文，如 `{"en":{"name","description","feats"},"ru":{...}}`；缺词前台回退中文主字段 |
 
 > 老数据库首次运行时会自动通过 `ALTER TABLE` 补齐新增列，无需手动迁移。
 
@@ -74,12 +75,14 @@ kdgogo-mall/
 ├── payment.html        # 支付页
 ├── orders.html         # 订单查询页
 ├── functions/          # Cloudflare Pages Functions 后端
-│   ├── _lib.js         # 共享工具：鉴权、建表 / 迁移、字段标准化
+│   ├── _lib.js         # 共享工具：鉴权、建表 / 迁移、字段标准化、译文规整
 │   └── api/
 │       ├── login.js     # POST /api/login 管理员登录
 │       ├── products.js # GET/POST /api/products 列表与新增
-│       └── products/[id].js # GET/PUT/DELETE /api/products/:id
-├── assets/             # 商品与主视觉图片
+│       ├── products/[id].js # GET/PUT/DELETE /api/products/:id
+│       └── translate.js # POST /api/translate 机翻预填草稿（管理鉴权）
+├── assets/             # 商品图片、主视觉与共享脚本
+│   └── i18n.js         # 前台共享多语言词典与商品取值回退 helper
 ├── LICENSE
 └── README.md
 ```
@@ -94,6 +97,7 @@ kdgogo-mall/
 | GET | /api/products/:id | 单个商品 | 无 |
 | PUT | /api/products/:id | 修改商品 | Bearer 密码 |
 | DELETE | /api/products/:id | 删除商品 | Bearer 密码 |
+| POST | /api/translate | 机翻预填译文草稿 `{target,text}` → `{result:{name,description,feats}}` | Bearer 密码 |
 
 写操作需请求头 `Authorization: Bearer <管理密码>`。默认管理密码为 `orange2026`，正式使用请在 Cloudflare 后台为项目添加环境变量 `ADMIN_PASSWORD` 覆盖。
 
@@ -121,7 +125,15 @@ python -m http.server 8080
 1. Cloudflare Dashboard → 左侧 **D1** → **Create database**，创建数据库；
 2. 进入 Workers & Pages → 点击本项目 → **Settings** → **Functions** → **D1 database bindings**；
 3. 点 **Add binding**，变量名填 `DB`，选择刚创建的数据库，保存；
-4. 保存后 Cloudflare 会自动重新部署，第一次访问前台时自动建表并写入默认商品。
+4. 保存后 Cloudflare 会自动重新部署，第一次访问前台时自动建表并写入默认商品；`i18n` 译文列也会由后端自动补齐，无需手动迁移。
+
+### 配置机翻通道（Workers AI，可选）
+
+后台「机翻预填」默认走 Cloudflare Workers AI：
+
+1. 项目 → **Settings** → **Functions** → **Workers AI bindings**；
+2. 点 **Add binding**，变量名填 `AI`，保存；
+3. 未绑定时机翻按钮会提示不可用，译文仍可在后台手工填写，不影响商品保存与前台展示。
 
 ### 配置管理密码（环境变量）
 

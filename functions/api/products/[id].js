@@ -30,12 +30,12 @@ export async function onRequest(context) {
     if (err) return json({ ok: false, error: err }, 400);
     await env.DB.prepare(
       `UPDATE products SET name=?, category=?, catName=?, price=?, rating=?, isNew=?, image=?, description=?, feats=?, on_sale=?, sort=?,
-        stock=?, brand=?, model=?, original_price=?, images=?, free_shipping=?, shipping_fee=? WHERE id=?`
+        stock=?, brand=?, model=?, original_price=?, images=?, free_shipping=?, shipping_fee=?, i18n=? WHERE id=?`
     ).bind(
       p.name, p.category, p.catName, p.price, p.rating, p.isNew, p.image, p.description,
       JSON.stringify(p.feats), p.on_sale, p.sort,
       p.stock, p.brand, p.model, p.original_price, JSON.stringify(p.images),
-      p.free_shipping, p.shipping_fee, id
+      p.free_shipping, p.shipping_fee, JSON.stringify(p.i18n || {}), id
     ).run();
     const updated = await env.DB.prepare("SELECT * FROM products WHERE id = ?").bind(id).first();
     return json({ ok: true, product: rowToProduct(updated) });

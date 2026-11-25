@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>收银台 · KDGOGO商城</title>
+<title data-i18n-title="title_pay">收银台 · KDGOGO商城</title>
 <meta name="description" content="KDGOGO商城收银台：选择支付方式完成付款。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23E84E0A'/><text x='32' y='45' font-size='34' text-anchor='middle' fill='%23fff' font-family='serif'>K</text></svg>">
 <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap">
@@ -37,6 +37,11 @@ a{color:inherit;text-decoration:none}
 .back-link{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:500;color:var(--ink-2);padding:8px 12px;border-radius:9px;transition:color .15s,background .15s}
 .back-link:hover{color:var(--brand);background:var(--brand-soft)}
 .back-link svg{width:16px;height:16px}
+.nav-toggle{display:none;width:40px;height:40px;border:1px solid var(--line);border-radius:10px;background:#fff;align-items:center;justify-content:center;color:var(--ink-2)}
+.nav-toggle svg{width:20px;height:20px}
+.lang-select{height:38px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:0 10px;font-size:13px;color:var(--ink-2);cursor:pointer}
+[dir="rtl"] .cashier-head .amount{text-align:left}
+[dir="rtl"] .order-info{flex-direction:row}
 
 /* ===== 主区 ===== */
 .page{padding:44px 0 72px}
@@ -118,7 +123,9 @@ a{color:inherit;text-decoration:none}
 .toast.show{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
 
 @media (max-width:700px){
-  .main-nav{display:none}
+  .nav-toggle{display:inline-flex}
+  .main-nav{position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:2px;background:var(--paper);border-bottom:1px solid var(--line);padding:10px 20px;box-shadow:var(--shadow);display:none;z-index:41}
+  .main-nav.open{display:flex}
   .header-inner{height:auto;padding:12px 0;flex-wrap:wrap;gap:10px}
   .page{padding:26px 0 56px}
   .footer-grid{grid-template-columns:1fr;gap:28px}
@@ -132,18 +139,36 @@ a{color:inherit;text-decoration:none}
 
 <header class="site-header">
   <div class="container header-inner">
-    <a class="brand" href="./" aria-label="KDGOGO商城首页">
+    <a class="brand" href="./" data-i18n-aria="brand" aria-label="KDGOGO商城首页">
       <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#E84E0A"/><path d="M16 8c-1.2 3.2-4 5-8 5.6V15c4.6.7 7.2 2.9 8 6.8 1-3.9 3.6-6.1 8.2-6.8v-1.4C20 13 17.2 11.2 16 8z" fill="#fff"/></svg>
-      KDGOGO商城
+      <span data-i18n="brand"></span>
     </a>
+    <button class="nav-toggle" id="navToggle" data-i18n-aria="menu" aria-label="菜单">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
     <nav class="main-nav" aria-label="主导航">
-      <a class="nav-link" href="./">首页</a>
-      <a class="nav-link" href="./orders.html">订单查询</a>
+      <a class="nav-link" href="./#home" data-i18n="nav_home"></a>
+      <a class="nav-link" href="./#shop" data-i18n="nav_all"></a>
+      <a class="nav-link" href="orders.html" data-i18n="nav_orders"></a>
     </nav>
     <div class="header-actions">
+      <select class="lang-select" id="langSelect" aria-label="语言">
+        <option value="zh">中文</option>
+        <option value="en">English</option>
+        <option value="ru">Русский</option>
+        <option value="es">Español</option>
+        <option value="ar">العربية</option>
+        <option value="fr">Français</option>
+        <option value="pt">Português</option>
+        <option value="de">Deutsch</option>
+        <option value="id">Bahasa Indonesia</option>
+        <option value="ja">日本語</option>
+        <option value="ko">한국어</option>
+        <option value="tr">Türkçe</option>
+      </select>
       <a class="back-link" href="./">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        返回商城
+        <span data-i18n="back_mall"></span>
       </a>
     </div>
   </div>
@@ -153,11 +178,11 @@ a{color:inherit;text-decoration:none}
   <section class="page">
     <div class="container">
       <div class="steps" aria-label="流程进度">
-        <span class="step done"><b>1</b> 确认订单</span>
+        <span class="step done"><b>1</b> <span data-i18n="step1"></span></span>
         <span class="step-arrow">→</span>
-        <span class="step on"><b>2</b> 在线支付</span>
+        <span class="step on"><b>2</b> <span data-i18n="step2"></span></span>
         <span class="step-arrow">→</span>
-        <span class="step"><b>3</b> 完成</span>
+        <span class="step"><b>3</b> <span data-i18n="step3"></span></span>
       </div>
 
       <!-- 收银台 -->
@@ -165,28 +190,28 @@ a{color:inherit;text-decoration:none}
         <div class="cashier-head">
           <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M7 15h3M7 18h2"/></svg></div>
           <div>
-            <div class="t1">订单提交成功，请在 30 分钟内完成支付</div>
-            <div class="t2">待支付金额 <span>¥<span id="payAmount">0</span></span></div>
+            <div class="t1" data-i18n="pay_head_t1"></div>
+            <div class="t2"><span data-i18n="pay_amount_lbl"></span> <span>¥<span id="payAmount">0</span></span></div>
           </div>
           <div class="amount">
-            <div class="lbl">订单编号</div>
+            <div class="lbl" data-i18n="order_no_lbl"></div>
             <b style="font-size:18px;color:var(--ink)" id="orderNoHead">——</b>
           </div>
         </div>
 
         <div class="order-info">
-          <span>收货人：<b id="receiverLine">——</b></span>
-          <span>商品件数：<b id="qtyLine">0 件</b></span>
+          <span><span data-i18n="receiver_lbl"></span><b id="receiverLine">——</b></span>
+          <span><span data-i18n="qty_lbl"></span><b id="qtyLine">0</b></span>
         </div>
 
         <div class="methods">
-          <div class="methods-title">选择支付方式</div>
+          <div class="methods-title" data-i18n="methods_title"></div>
           <label class="method sel">
             <input type="radio" name="pay" value="alipay" checked>
             <span class="logo" style="background:#1677FF">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M6.5 9.5c4-1.5 9-1.8 13-1.5M4.5 12.5c3.5 1.5 8.5 2 12 1.5"/><path d="M8.5 21c2.5-3.5 5-9 6.5-14"/></svg>
             </span>
-            <div><div class="m-name">支付宝</div><div class="m-desc">推荐有支付宝账号的用户</div></div>
+            <div><div class="m-name" data-i18n="m_alipay"></div><div class="m-desc" data-i18n="m_alipay_d"></div></div>
             <span class="radio"></span>
           </label>
           <label class="method">
@@ -194,7 +219,7 @@ a{color:inherit;text-decoration:none}
             <span class="logo" style="background:#07C160">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5C5 5 2 7.5 2 10.5c0 1.7 1 3.2 2.6 4.2L4 17l2.4-1.2c.8.2 1.7.3 2.6.3"/><circle cx="17" cy="12" r="5"/><path d="M20 12h.01M17 15h.01M14 12h.01"/></svg>
             </span>
-            <div><div class="m-name">微信支付</div><div class="m-desc">推荐有微信钱包的用户</div></div>
+            <div><div class="m-name" data-i18n="m_wechat"></div><div class="m-desc" data-i18n="m_wechat_d"></div></div>
             <span class="radio"></span>
           </label>
           <label class="method">
@@ -202,7 +227,7 @@ a{color:inherit;text-decoration:none}
             <span class="logo" style="background:#5C5851">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></svg>
             </span>
-            <div><div class="m-name">银行卡</div><div class="m-desc">支持储蓄卡 / 信用卡</div></div>
+            <div><div class="m-name" data-i18n="m_card"></div><div class="m-desc" data-i18n="m_card_d"></div></div>
             <span class="radio"></span>
           </label>
         </div>
@@ -210,13 +235,13 @@ a{color:inherit;text-decoration:none}
         <div class="pay-area">
           <button class="pay-btn" id="payBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5 4.5 5v6c0 5 3.2 8.6 7.5 10.5 4.3-1.9 7.5-5.5 7.5-10.5V5z"/><path d="M8.8 11.8l2.2 2.2 4.2-4.4"/></svg>
-            立即支付 ¥<span id="payBtnAmount">0</span>
+            <span data-i18n="pay_btn"></span> ¥<span id="payBtnAmount">0</span>
           </button>
           <div class="countdown" id="countdown"></div>
         </div>
         <div class="secure-note">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5 4.5 5v6c0 5 3.2 8.6 7.5 10.5 4.3-1.9 7.5-5.5 7.5-10.5V5z"/><path d="M8.8 11.8l2.2 2.2 4.2-4.4"/></svg>
-          订单信息已加密传输，请放心完成结算与支付。
+          <span data-i18n="secure_note"></span>
         </div>
       </div>
 
@@ -224,12 +249,12 @@ a{color:inherit;text-decoration:none}
       <div class="cashier hide" id="successView">
         <div class="success-wrap">
           <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
-          <h2>支付成功</h2>
-          <p>感谢你的购买，我们会尽快为你发货。</p>
+          <h2 data-i18n="success_title"></h2>
+          <p data-i18n="success_sub"></p>
           <div class="order-no" id="successNo">——</div>
           <div class="actions">
-            <a class="btn btn-primary" href="./orders.html">查看订单</a>
-            <a class="btn btn-ghost" href="./">返回首页</a>
+            <a class="btn btn-primary" href="./orders.html" data-i18n="view_orders"></a>
+            <a class="btn btn-ghost" href="./" data-i18n="back_home"></a>
           </div>
         </div>
       </div>
@@ -241,33 +266,37 @@ a{color:inherit;text-decoration:none}
   <div class="container">
     <div class="footer-grid">
       <div class="footer-brand">
-        <b>KDGOGO商城</b>
-        <p>精选数码与生活好物，正品保障、极速发货，为你提供省心的线上购物体验。</p>
+        <b data-i18n="brand"></b>
+        <p data-i18n="footer_desc"></p>
       </div>
       <div class="footer-col">
-        <b>快速导航</b>
-        <a href="./">首页</a>
-        <a href="./orders.html">订单查询</a>
-        <a href="./checkout.html">去结算</a>
+        <b data-i18n="footer_nav"></b>
+        <a href="./#home" data-i18n="nav_home"></a>
+        <a href="./orders.html" data-i18n="nav_orders"></a>
+        <a href="./checkout.html" data-i18n="checkout"></a>
       </div>
       <div class="footer-col">
-        <b>商城信息</b>
-        <span class="f-item">关于我们</span>
-        <span class="f-item">售后政策</span>
-        <span class="f-item">联系客服</span>
-        <span class="f-item">配送说明</span>
+        <b data-i18n="footer_info"></b>
+        <span class="f-item" data-i18n="f_about"></span>
+        <span class="f-item" data-i18n="f_policy"></span>
+        <span class="f-item" data-i18n="f_contact"></span>
+        <span class="f-item" data-i18n="f_shipping"></span>
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 KDGOGO商城</span>
-      <span>KDGOGO Mall · 数码与生活好物精选</span>
+      <span data-i18n="footer_copy"></span>
+      <span data-i18n="footer_right"></span>
     </div>
   </div>
 </footer>
 
 <div class="toast" id="toast" role="status"></div>
 
+<script src="assets/i18n.js"></script>
 <script>
+/* ===== 多语言 ===== */
+const { t, applyLang, initLangSelect } = KDGOGO_I18N;
+
 /* ===== 工具 ===== */
 const $ = (s) => document.querySelector(s);
 const toastEl = $("#toast");
@@ -299,7 +328,8 @@ function refreshFromStorage(){
 }
 
 /* ===== 渲染 ===== */
-const PAY_LABEL = { alipay:"支付宝", wechat:"微信支付", card:"银行卡" };
+const PAY_LABEL_KEY = { alipay:"m_alipay", wechat:"m_wechat", card:"m_card" };
+const payLabel = (k) => t(PAY_LABEL_KEY[k] || "m_card");
 let countdownLeft = 30 * 60;
 let countdownTimer = null;
 
@@ -308,13 +338,13 @@ function render(){
   $("#payAmount").textContent = order.total;
   $("#payBtnAmount").textContent = order.total;
   $("#receiverLine").textContent = esc(order.receiver.name + "  " + order.receiver.phone);
-  $("#qtyLine").textContent = order.items.reduce((s,i)=>s+i.qty,0) + " 件";
+  $("#qtyLine").textContent = order.items.reduce((s,i)=>s+i.qty,0) + " " + t("qty_unit");
 }
 
 function updateCountdown(){
   const m = String(Math.floor(countdownLeft/60)).padStart(2,"0");
   const s = String(countdownLeft%60).padStart(2,"0");
-  $("#countdown").textContent = `剩余支付时间 ${m}:${s}`;
+  $("#countdown").textContent = t("countdown_t", { m, s });
   if (countdownLeft <= 0){
     clearInterval(countdownTimer);
     expireOrder();
@@ -326,7 +356,7 @@ function expireOrder(){
   order.status = "closed";
   order.closedAt = Date.now();
   saveOrders();
-  toast("订单已超时关闭");
+  toast(t("toast_closed"));
   location.href = "orders.html?status=closed";
 }
 function saveOrders(){
@@ -345,17 +375,17 @@ let paying = false;
 $("#payBtn").addEventListener("click", () => {
   if (paying) return;
   refreshFromStorage();
-  if (!order || order.status !== "pending"){ toast("订单状态已变化，请刷新"); return; }
-  const method = PAY_LABEL[document.querySelector("input[name=pay]:checked").value];
+  if (!order || order.status !== "pending"){ toast(t("toast_status")); return; }
+  const method = payLabel(document.querySelector("input[name=pay]:checked").value);
   paying = true;
   const btn = $("#payBtn");
   btn.disabled = true;
-  btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5 4.5 5v6c0 5 3.2 8.6 7.5 10.5 4.3-1.9 7.5-5.5 7.5-10.5V5z"/><path d="M8.8 11.8l2.2 2.2 4.2-4.4"/></svg> 正在跳转 ${method}…`;
+  btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5 4.5 5v6c0 5 3.2 8.6 7.5 10.5 4.3-1.9 7.5-5.5 7.5-10.5V5z"/><path d="M8.8 11.8l2.2 2.2 4.2-4.4"/></svg> ${t("redirecting", { method })}`;
 
   // 模拟支付网关回调（2 秒后支付成功）
   setTimeout(() => {
     refreshFromStorage();
-    if (!order || order.status !== "pending"){ toast("订单状态已变化"); return; }
+    if (!order || order.status !== "pending"){ toast(t("toast_status2")); return; }
     order.status = "paid";
     order.paidAt = Date.now();
     order.payMethod = method;
@@ -363,9 +393,9 @@ $("#payBtn").addEventListener("click", () => {
     clearInterval(countdownTimer);
     // 清空购物车（该订单对应的商品）
     let cart = {};
-    try { cart = JSON.parse(localStorage.getItem("orange-mall-cart-v1")) || {}; } catch(e){ cart = {}; }
+    try { cart = JSON.parse(localStorage.getItem("kdgogo-mall-cart-v1")) || JSON.parse(localStorage.getItem("orange-mall-cart-v1")) || {}; } catch(e){ cart = {}; }
     order.items.forEach(i => { delete cart[i.id]; });
-    try { localStorage.setItem("orange-mall-cart-v1", JSON.stringify(cart)); } catch(e){}
+    try { localStorage.setItem("kdgogo-mall-cart-v1", JSON.stringify(cart)); } catch(e){}
     $("#successNo").textContent = order.no;
     $("#cashier").classList.add("hide");
     $("#successView").classList.remove("hide");
@@ -373,7 +403,16 @@ $("#payBtn").addEventListener("click", () => {
   }, 2000);
 });
 
+/* ===== 移动端导航菜单 ===== */
+const navToggle = $("#navToggle"), mainNav = $(".main-nav");
+if (navToggle && mainNav){
+  navToggle.addEventListener("click", () => mainNav.classList.toggle("open"));
+  mainNav.addEventListener("click", e => { if (e.target.closest(".nav-link")) mainNav.classList.remove("open"); });
+}
+
 /* ===== 启动 ===== */
+initLangSelect(() => { if (order && order.status === "pending") render(); });
+applyLang();
 if (order && order.status === "pending"){
   render();
   updateCountdown();

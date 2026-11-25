@@ -52,8 +52,45 @@ const EXTRA_COLUMNS = [
   ["original_price", "REAL NOT NULL DEFAULT 0"],
   ["images", "TEXT NOT NULL DEFAULT '[]'"],
   ["free_shipping", "INTEGER NOT NULL DEFAULT 1"],
-  ["shipping_fee", "REAL NOT NULL DEFAULT 0"]
+  ["shipping_fee", "REAL NOT NULL DEFAULT 0"],
+  ["i18n", "TEXT NOT NULL DEFAULT '{}'"]
 ];
+
+/* 可录入译文的语种（zh 为主语言，存原字段，不进 i18n） */
+export const I18N_LANGS = ["en", "ru", "es", "ar", "fr", "pt", "de", "id", "ja", "ko", "tr"];
+
+function parseI18n(raw) {
+  let obj = {};
+  if (!raw) return obj;
+  if (typeof raw === "string") {
+    try { obj = JSON.parse(raw); } catch (e) { return {}; }
+  } else if (typeof raw === "object") {
+    obj = raw;
+  }
+  return obj && typeof obj === "object" ? obj : {};
+}
+
+/* 规整入参里的译文块：剔除非语种、空字段，feats 过滤空串 */
+function normalizeI18n(raw) {
+  const src = parseI18n(raw);
+  const out = {};
+  for (const [ln, block] of Object.entries(src)) {
+    if (!I18N_LANGS.includes(ln) || !block || typeof block !== "object") continue;
+    const clean = {};
+    const name = String(block.name || "").trim();
+    const description = String(block.description || "").trim();
+    const catName = String(block.catName || "").trim();
+    const feats = Array.isArray(block.feats)
+      ? block.feats.map(f => String(f).trim()).filter(Boolean)
+      : [];
+    if (name) clean.name = name;
+    if (description) clean.description = description;
+    if (catName) clean.catName = catName;
+    if (feats.length) clean.feats = feats;
+    if (Object.keys(clean).length) out[ln] = clean;
+  }
+  return out;
+}
 
 export async function ensureDb(env) {
   // 建表；表为空时写入默认商品（首次访问自动初始化）
@@ -100,6 +137,7 @@ export function rowToProduct(r) {
   let feats = parseJsonArray(r.feats);
   let images = parseJsonArray(r.images);
   if (!images.length && r.image) images = [r.image];
+  const i18n = parseI18n(r.i18n);
   return {
     id: r.id,
     name: r.name,
@@ -119,7 +157,8 @@ export function rowToProduct(r) {
     model: r.model || "",
     original_price: r.original_price || 0,
     free_shipping: !!r.free_shipping,
-    shipping_fee: r.shipping_fee || 0
+    shipping_fee: r.shipping_fee || 0,
+    i18n
   };
 }
 
@@ -151,7 +190,8 @@ export function normalizeProduct(b) {
     model: String(b.model ?? "").trim(),
     original_price: Math.max(0, Number(b.original_price) || 0),
     free_shipping: b.free_shipping === false ? 0 : 1,
-    shipping_fee: Math.max(0, Number(b.shipping_fee) || 0)
+    shipping_fee: Math.max(0, Number(b.shipping_fee) || 0),
+    i18n: normalizeI18n(b.i18n)
   };
 }
 

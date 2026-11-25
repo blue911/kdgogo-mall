@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>确认订单 · KDGOGO商城</title>
+<title data-i18n-title="title_co">确认订单 · KDGOGO商城</title>
 <meta name="description" content="KDGOGO商城结算页：核对收货信息与商品清单，确认订单后进入支付。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23E84E0A'/><text x='32' y='45' font-size='34' text-anchor='middle' fill='%23fff' font-family='serif'>K</text></svg>">
 <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap">
@@ -38,6 +38,11 @@ a{color:inherit;text-decoration:none}
 .back-link{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:500;color:var(--ink-2);padding:8px 12px;border-radius:9px;transition:color .15s,background .15s}
 .back-link:hover{color:var(--brand);background:var(--brand-soft)}
 .back-link svg{width:16px;height:16px}
+.nav-toggle{display:none;width:40px;height:40px;border:1px solid var(--line);border-radius:10px;background:#fff;align-items:center;justify-content:center;color:var(--ink-2)}
+.nav-toggle svg{width:20px;height:20px}
+.lang-select{height:38px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:0 10px;font-size:13px;color:var(--ink-2);cursor:pointer}
+[dir="rtl"] .m-right{margin-left:0;margin-right:auto}
+[dir="rtl"] .order-status,[dir="rtl"] .ops{margin-left:0;margin-right:auto}
 
 /* ===== 页面主区 ===== */
 .page{padding:40px 0 72px}
@@ -128,7 +133,9 @@ a{color:inherit;text-decoration:none}
   .layout{grid-template-columns:1fr}
   .form-grid{grid-template-columns:1fr}
   .footer-grid{grid-template-columns:1fr;gap:28px}
-  .main-nav{display:none}
+  .nav-toggle{display:inline-flex}
+  .main-nav{position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:2px;background:var(--paper);border-bottom:1px solid var(--line);padding:10px 20px;box-shadow:var(--shadow);display:none;z-index:41}
+  .main-nav.open{display:flex}
   .header-inner{height:auto;padding:12px 0;flex-wrap:wrap;gap:10px}
   .page{padding:26px 0 56px}
   .page-head h1{font-size:28px}
@@ -139,18 +146,37 @@ a{color:inherit;text-decoration:none}
 
 <header class="site-header">
   <div class="container header-inner">
-    <a class="brand" href="./" aria-label="KDGOGO商城首页">
+    <a class="brand" href="./" data-i18n-aria="brand" aria-label="KDGOGO商城首页">
       <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#E84E0A"/><path d="M16 8c-1.2 3.2-4 5-8 5.6V15c4.6.7 7.2 2.9 8 6.8 1-3.9 3.6-6.1 8.2-6.8v-1.4C20 13 17.2 11.2 16 8z" fill="#fff"/></svg>
-      KDGOGO商城
+      <span data-i18n="brand"></span>
     </a>
+    <button class="nav-toggle" id="navToggle" data-i18n-aria="menu" aria-label="菜单">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
     <nav class="main-nav" aria-label="主导航">
-      <a class="nav-link" href="./">首页</a>
-      <a class="nav-link" href="./orders.html">订单查询</a>
+      <a class="nav-link" href="./#home" data-i18n="nav_home"></a>
+      <a class="nav-link" href="./#shop" data-i18n="nav_all"></a>
+      <a class="nav-link" href="./#shop" data-i18n="nav_new"></a>
+      <a class="nav-link" href="orders.html" data-i18n="nav_orders"></a>
     </nav>
     <div class="header-actions">
+      <select class="lang-select" id="langSelect" aria-label="语言">
+        <option value="zh">中文</option>
+        <option value="en">English</option>
+        <option value="ru">Русский</option>
+        <option value="es">Español</option>
+        <option value="ar">العربية</option>
+        <option value="fr">Français</option>
+        <option value="pt">Português</option>
+        <option value="de">Deutsch</option>
+        <option value="id">Bahasa Indonesia</option>
+        <option value="ja">日本語</option>
+        <option value="ko">한국어</option>
+        <option value="tr">Türkçe</option>
+      </select>
       <a class="back-link" href="./">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        返回商城
+        <span data-i18n="back_mall"></span>
       </a>
     </div>
   </div>
@@ -160,63 +186,63 @@ a{color:inherit;text-decoration:none}
   <section class="page">
     <div class="container">
       <div class="page-head">
-        <span class="page-eyebrow">KDGOGO商城 · 结算</span>
-        <h1>确认订单</h1>
-        <p>请核对收货信息与商品清单，确认无误后提交订单。</p>
+        <span class="page-eyebrow" data-i18n="co_eyebrow"></span>
+        <h1 data-i18n="co_title"></h1>
+        <p data-i18n="co_sub"></p>
       </div>
       <div class="steps" aria-label="流程进度">
-        <span class="step on"><b>1</b> 确认订单</span>
+        <span class="step on"><b>1</b> <span data-i18n="step1"></span></span>
         <span class="step-arrow">→</span>
-        <span class="step"><b>2</b> 在线支付</span>
+        <span class="step"><b>2</b> <span data-i18n="step2"></span></span>
         <span class="step-arrow">→</span>
-        <span class="step"><b>3</b> 完成</span>
+        <span class="step"><b>3</b> <span data-i18n="step3"></span></span>
       </div>
 
       <div id="emptyWrap" class="empty-wrap" style="display:none">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1.4"/><circle cx="19" cy="21" r="1.4"/><path d="M2.5 3h2l2.6 12.4a2 2 0 0 0 2 1.6h8.7a2 2 0 0 0 2-1.6L21.5 7H6"/></svg>
-        <h2>购物车还是空的</h2>
-        <p>先去挑选几件心仪的好物，再回来结算吧。</p>
-        <a class="btn btn-primary" href="./" style="width:auto;padding:13px 34px">去逛逛</a>
+        <h2 data-i18n="cart_empty"></h2>
+        <p data-i18n="co_empty_sub"></p>
+        <a class="btn btn-primary" href="./" style="width:auto;padding:13px 34px" data-i18n="go_shop"></a>
       </div>
 
       <div class="layout" id="checkoutView">
         <div>
           <div class="panel">
-            <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>收货信息</h2>
+            <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span data-i18n="co_receiver"></span></h2>
             <div class="form-grid">
               <div class="field">
-                <label for="fName">收货人 *</label>
-                <input type="text" id="fName" maxlength="20" placeholder="请输入姓名">
+                <label for="fName" data-i18n="f_name"></label>
+                <input type="text" id="fName" maxlength="20" data-i18n-ph="ph_name" placeholder="请输入姓名">
               </div>
               <div class="field">
-                <label for="fPhone">手机号 *</label>
-                <input type="tel" id="fPhone" maxlength="11" placeholder="11 位手机号">
+                <label for="fPhone" data-i18n="f_phone"></label>
+                <input type="tel" id="fPhone" maxlength="11" data-i18n-ph="ph_phone" placeholder="11 位手机号">
               </div>
             </div>
             <div class="field">
-              <label for="fAddr">收货地址 *</label>
-              <textarea id="fAddr" maxlength="120" placeholder="省 / 市 / 区 + 详细地址"></textarea>
+              <label for="fAddr" data-i18n="f_addr"></label>
+              <textarea id="fAddr" maxlength="120" data-i18n-ph="ph_addr" placeholder="省 / 市 / 区 + 详细地址"></textarea>
             </div>
             <div class="field">
-              <label for="fNote">订单备注（可选）</label>
-              <input type="text" id="fNote" maxlength="80" placeholder="给商家留言">
+              <label for="fNote" data-i18n="f_note"></label>
+              <input type="text" id="fNote" maxlength="80" data-i18n-ph="ph_note" placeholder="给商家留言">
             </div>
           </div>
 
           <div class="panel" style="margin-top:24px">
-            <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6h13v10H2.5z"/><path d="M15.5 9h3.4l2.6 3v4h-6z"/><circle cx="6.2" cy="18.5" r="1.8"/><circle cx="17.5" cy="18.5" r="1.8"/></svg>配送方式</h2>
+            <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6h13v10H2.5z"/><path d="M15.5 9h3.4l2.6 3v4h-6z"/><circle cx="6.2" cy="18.5" r="1.8"/><circle cx="17.5" cy="18.5" r="1.8"/></svg><span data-i18n="co_delivery"></span></h2>
             <div class="methods">
               <label class="method sel">
                 <input type="radio" name="delivery" value="0" checked>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6h13v10H2.5z"/><path d="M15.5 9h3.4l2.6 3v4h-6z"/><circle cx="6.2" cy="18.5" r="1.8"/><circle cx="17.5" cy="18.5" r="1.8"/></svg>
-                <div><div class="m-name">标准配送</div><div class="m-desc">预计 2–4 天送达</div></div>
-                <span class="m-right">免费</span>
+                <div><div class="m-name" data-i18n="std_name"></div><div class="m-desc" data-i18n="std_desc"></div></div>
+                <span class="m-right" data-i18n="std_free"></span>
               </label>
               <label class="method">
                 <input type="radio" name="delivery" value="12">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>
-                <div><div class="m-name">极速配送</div><div class="m-desc">最快次日达</div></div>
-                <span class="m-right">+¥12</span>
+                <div><div class="m-name" data-i18n="fast_name"></div><div class="m-desc" data-i18n="fast_desc"></div></div>
+                <span class="m-right" data-i18n="fast_fee"></span>
               </label>
             </div>
           </div>
@@ -224,18 +250,18 @@ a{color:inherit;text-decoration:none}
 
         <div>
           <div class="panel" style="position:sticky;top:84px">
-            <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>商品清单</h2>
+            <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg><span data-i18n="co_items"></span></h2>
             <div class="order-items" id="orderItems"></div>
             <div class="summary" style="margin-top:14px">
-              <div class="summary-row"><span>商品金额</span><span id="goodsAmount">¥0</span></div>
-              <div class="summary-row"><span>配送费</span><span id="deliveryFee">¥0</span></div>
-              <div class="summary-row"><span>优惠</span><span style="color:var(--ok)">-¥0</span></div>
-              <div class="summary-total"><span>应付金额</span><b><small>¥</small><span id="totalAmount">0</span></b></div>
+              <div class="summary-row"><span data-i18n="sum_goods"></span><span id="goodsAmount">¥0</span></div>
+              <div class="summary-row"><span data-i18n="sum_ship"></span><span id="deliveryFee">¥0</span></div>
+              <div class="summary-row"><span data-i18n="sum_discount"></span><span style="color:var(--ok)">-¥0</span></div>
+              <div class="summary-total"><span data-i18n="sum_total"></span><b><small>¥</small><span id="totalAmount">0</span></b></div>
             </div>
-            <button class="btn btn-primary" id="submitBtn" style="margin-top:18px">提交订单</button>
+            <button class="btn btn-primary" id="submitBtn" style="margin-top:18px" data-i18n="co_submit"></button>
             <div class="secure-note">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5 4.5 5v6c0 5 3.2 8.6 7.5 10.5 4.3-1.9 7.5-5.5 7.5-10.5V5z"/><path d="M8.8 11.8l2.2 2.2 4.2-4.4"/></svg>
-              订单信息已加密传输，请放心完成结算与支付。
+              <span data-i18n="secure_note"></span>
             </div>
           </div>
         </div>
@@ -248,33 +274,38 @@ a{color:inherit;text-decoration:none}
   <div class="container">
     <div class="footer-grid">
       <div class="footer-brand">
-        <b>KDGOGO商城</b>
-        <p>精选数码与生活好物，正品保障、极速发货，为你提供省心的线上购物体验。</p>
+        <b data-i18n="brand"></b>
+        <p data-i18n="footer_desc"></p>
       </div>
       <div class="footer-col">
-        <b>快速导航</b>
-        <a href="./">首页</a>
-        <a href="./orders.html">订单查询</a>
-        <a href="./checkout.html">去结算</a>
+        <b data-i18n="footer_nav"></b>
+        <a href="./#home" data-i18n="nav_home"></a>
+        <a href="./orders.html" data-i18n="nav_orders"></a>
+        <a href="./checkout.html" data-i18n="checkout"></a>
       </div>
       <div class="footer-col">
-        <b>商城信息</b>
-        <span class="f-item">关于我们</span>
-        <span class="f-item">售后政策</span>
-        <span class="f-item">联系客服</span>
-        <span class="f-item">配送说明</span>
+        <b data-i18n="footer_info"></b>
+        <span class="f-item" data-i18n="f_about"></span>
+        <span class="f-item" data-i18n="f_policy"></span>
+        <span class="f-item" data-i18n="f_contact"></span>
+        <span class="f-item" data-i18n="f_shipping"></span>
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 KDGOGO商城</span>
-      <span>KDGOGO Mall · 数码与生活好物精选</span>
+      <span data-i18n="footer_copy"></span>
+      <span data-i18n="footer_right"></span>
     </div>
   </div>
 </footer>
 
 <div class="toast" id="toast" role="status"></div>
 
+<script src="assets/i18n.js"></script>
 <script>
+/* ===== 多语言 ===== */
+const { t, applyLang, initLangSelect, pickProd } = KDGOGO_I18N;
+const pName = p => pickProd(p, "name");
+
 /* ===== 工具 ===== */
 const $ = (s) => document.querySelector(s);
 const toastEl = $("#toast");
@@ -300,9 +331,9 @@ const FALLBACK_PRODUCTS = [
 ];
 let PRODUCTS = FALLBACK_PRODUCTS;
 
-/* ===== 购物车（与首页共用 localStorage） ===== */
+/* ===== 购物车（与首页共用 localStorage，兼容旧键名） ===== */
 let cart = {};
-try { cart = JSON.parse(localStorage.getItem("orange-mall-cart-v1")) || {}; } catch(e) { cart = {}; }
+try { cart = JSON.parse(localStorage.getItem("kdgogo-mall-cart-v1")) || JSON.parse(localStorage.getItem("orange-mall-cart-v1")) || {}; } catch(e) { cart = {}; }
 function cartEntries(){ return Object.entries(cart).map(([id,q])=>({ p: PRODUCTS.find(x=>x.id==id), q })).filter(x=>x.p); }
 function goodsTotal(entries){ return entries.reduce((s,e)=> s + e.p.price*e.q, 0); }
 
@@ -317,9 +348,9 @@ function render(){
   $("#checkoutView").style.display = "grid";
   $("#orderItems").innerHTML = entries.map(e => `
     <div class="order-item">
-      <img src="${e.p.img}" alt="${esc(e.p.name)}">
+      <img src="${e.p.img}" alt="${esc(pName(e.p))}">
       <div>
-        <div class="o-name">${esc(e.p.name)}</div>
+        <div class="o-name">${esc(pName(e.p))}</div>
         <div class="o-sub">¥${e.p.price} × ${e.q}</div>
       </div>
       <div class="o-price"><small>¥</small>${e.p.price * e.q}</div>
@@ -358,17 +389,17 @@ $("#submitBtn").addEventListener("click", () => {
   const name = $("#fName").value.trim();
   const phone = $("#fPhone").value.trim();
   const addr = $("#fAddr").value.trim();
-  if (!name){ toast("请填写收货人姓名"); return; }
-  if (!/^1\d{10}$/.test(phone)){ toast("请填写正确的 11 位手机号"); return; }
-  if (addr.length < 5){ toast("请填写完整的收货地址"); return; }
+  if (!name){ toast(t("err_name")); return; }
+  if (!/^1\d{10}$/.test(phone)){ toast(t("err_phone")); return; }
+  if (addr.length < 5){ toast(t("err_addr")); return; }
   const entries = cartEntries();
-  if (!entries.length){ toast("购物车是空的"); return; }
+  if (!entries.length){ toast(t("err_cart")); return; }
 
   const orderNo = genOrderNo();
   const now = Date.now();
   const order = {
     no: orderNo,
-    items: entries.map(e => ({ id:e.p.id, name:e.p.name, img:e.p.img, price:e.p.price, qty:e.q })),
+    items: entries.map(e => ({ id:e.p.id, name:pName(e.p), img:e.p.img, price:e.p.price, qty:e.q })),
     goods: goodsTotal(entries),
     deliveryFee,
     total: goodsTotal(entries) + deliveryFee,
@@ -382,7 +413,7 @@ $("#submitBtn").addEventListener("click", () => {
     const orders = JSON.parse(localStorage.getItem("orange-mall-orders-v1")) || [];
     orders.unshift(order);
     localStorage.setItem("orange-mall-orders-v1", JSON.stringify(orders));
-  } catch(e){ toast("保存订单失败"); return; }
+  } catch(e){ toast(t("err_save")); return; }
 
   // 跳转到支付页
   location.href = "payment.html?no=" + encodeURIComponent(orderNo);
@@ -395,11 +426,18 @@ async function loadProducts(){
     if (!res.ok) throw new Error("API " + res.status);
     const data = await res.json();
     if (data.ok && Array.isArray(data.products) && data.products.length){
-      PRODUCTS = data.products.map(p => ({ id:p.id, name:p.name, cat:p.category, catName:p.catName, price:p.price, img:p.image||"assets/hero.jpg" }));
+      PRODUCTS = data.products.map(p => ({ id:p.id, name:p.name, category:p.category, cat:p.category, catName:p.catName, description:p.description||"", i18n:p.i18n||{}, price:p.price, img:p.image||"assets/hero.jpg" }));
       render();
     }
   }catch(e){}
 }
+/* 移动端导航菜单 */
+const navToggle = $("#navToggle"), mainNav = $(".main-nav");
+navToggle.addEventListener("click", () => mainNav.classList.toggle("open"));
+mainNav.addEventListener("click", e => { if (e.target.closest(".nav-link")) mainNav.classList.remove("open"); });
+
+initLangSelect(() => render());
+applyLang();
 render();
 loadProducts();
 </script>

@@ -3,14 +3,14 @@
 import { json, isAuthed, ensureDb, rowToProduct, normalizeProduct, validateProduct } from "../_lib.js";
 
 const COLS = `name, category, catName, price, rating, isNew, image, description, feats, on_sale, sort,
-  stock, brand, model, original_price, images, free_shipping, shipping_fee`;
+  stock, brand, model, original_price, images, free_shipping, shipping_fee, i18n`;
 
 function bindProduct(p) {
   return [
     p.name, p.category, p.catName, p.price, p.rating, p.isNew, p.image, p.description,
     JSON.stringify(p.feats), p.on_sale, p.sort,
     p.stock, p.brand, p.model, p.original_price, JSON.stringify(p.images),
-    p.free_shipping, p.shipping_fee
+    p.free_shipping, p.shipping_fee, JSON.stringify(p.i18n || {})
   ];
 }
 
@@ -34,7 +34,7 @@ export async function onRequest(context) {
     const err = validateProduct(p);
     if (err) return json({ ok: false, error: err }, 400);
     const res = await env.DB.prepare(
-      `INSERT INTO products (${COLS}) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO products (${COLS}) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     ).bind(...bindProduct(p)).run();
     const created = await env.DB.prepare("SELECT * FROM products WHERE id = ?").bind(res.meta.last_row_id).first();
     return json({ ok: true, product: rowToProduct(created) }, 201);

@@ -58,6 +58,15 @@ a{color:inherit;text-decoration:none}
 .check-row input{width:16px;height:16px;accent-color:var(--brand)}
 .field input:disabled{background:var(--warm);color:var(--muted)}
 
+/* 多语言译文块 */
+.i18n-block{border:1px dashed var(--line);border-radius:12px;padding:14px 16px;background:#FDFCF9}
+.i18n-tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.i18n-tab{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:600;cursor:pointer;color:var(--ink-2)}
+.i18n-tab.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+.i18n-pane[hidden]{display:none}
+.i18n-pane .field{margin-bottom:12px}
+.i18n-actions{display:flex;justify-content:flex-end;margin-top:4px}
+
 /* 主视图 */
 .page{padding:34px 0 64px}
 .page-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:22px}
@@ -261,6 +270,50 @@ td img.thumb{width:52px;height:52px;border-radius:9px;object-fit:cover;backgroun
           <label for="fFeats">卖点（每行一条）</label>
           <textarea id="fFeats" placeholder="蓝牙 5.3 低延迟&#10;单次续航 8 小时"></textarea>
         </div>
+
+        <div class="field full i18n-block">
+          <label>多语言译文（可选；留空的语种前台自动回退中文）</label>
+          <div class="i18n-tabs" id="i18nTabs">
+            <button type="button" class="i18n-tab active" data-ln="en">English</button>
+            <button type="button" class="i18n-tab" data-ln="ru">Русский</button>
+          </div>
+
+          <div class="i18n-pane" data-ln="en">
+            <div class="field">
+              <label for="tr-en-name">商品名称（英文）</label>
+              <input type="text" id="tr-en-name" maxlength="40">
+            </div>
+            <div class="field full">
+              <label for="tr-en-desc">一句话描述（英文）</label>
+              <input type="text" id="tr-en-desc" maxlength="60">
+            </div>
+            <div class="field full">
+              <label for="tr-en-feats">卖点（英文，每行一条）</label>
+              <textarea id="tr-en-feats" placeholder="Bluetooth 5.3 low latency&#10;8-hour battery"></textarea>
+            </div>
+            <div class="i18n-actions">
+              <button type="button" class="btn btn-ghost btn-sm" data-translate="en">机翻预填 English</button>
+            </div>
+          </div>
+
+          <div class="i18n-pane" data-ln="ru" hidden>
+            <div class="field">
+              <label for="tr-ru-name">商品名称（俄文）</label>
+              <input type="text" id="tr-ru-name" maxlength="40">
+            </div>
+            <div class="field full">
+              <label for="tr-ru-desc">一句话描述（俄文）</label>
+              <input type="text" id="tr-ru-desc" maxlength="60">
+            </div>
+            <div class="field full">
+              <label for="tr-ru-feats">卖点（俄文，每行一条）</label>
+              <textarea id="tr-ru-feats" placeholder="Bluetooth 5.3, низкая задержка&#10;Автономность 8 часов"></textarea>
+            </div>
+            <div class="i18n-actions">
+              <button type="button" class="btn btn-ghost btn-sm" data-translate="ru">机翻预填 Русский</button>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="modal-foot">
         <button type="button" class="btn btn-ghost" id="cancelBtn">取消</button>
@@ -417,6 +470,66 @@ async function removeProduct(id){
 }
 
 /* ===== 新增 / 编辑 ===== */
+const TR_LANGS = ["en", "ru"];
+function fillTr(ln, block){
+  block = block || {};
+  $("#tr-" + ln + "-name").value = block.name || "";
+  $("#tr-" + ln + "-desc").value = block.description || "";
+  $("#tr-" + ln + "-feats").value = Array.isArray(block.feats) ? block.feats.join("\n") : "";
+}
+function collectI18n(){
+  const out = {};
+  TR_LANGS.forEach(ln => {
+    const name = $("#tr-" + ln + "-name").value.trim();
+    const description = $("#tr-" + ln + "-desc").value.trim();
+    const feats = $("#tr-" + ln + "-feats").value.split("\n").map(s => s.trim()).filter(Boolean);
+    const clean = {};
+    if (name) clean.name = name;
+    if (description) clean.description = description;
+    if (feats.length) clean.feats = feats;
+    if (Object.keys(clean).length) out[ln] = clean;
+  });
+  return out;
+}
+
+/* 译文选项卡切换 */
+$("#i18nTabs").addEventListener("click", e => {
+  const btn = e.target.closest(".i18n-tab");
+  if (!btn) return;
+  document.querySelectorAll(".i18n-tab").forEach(b => b.classList.toggle("active", b === btn));
+  document.querySelectorAll(".i18n-pane").forEach(p => { p.hidden = p.dataset.ln !== btn.dataset.ln; });
+});
+
+/* 机翻预填：生成草稿，人工核对后随商品保存 */
+document.addEventListener("click", async e => {
+  const btn = e.target.closest("[data-translate]");
+  if (!btn) return;
+  const ln = btn.dataset.translate;
+  const text = {
+    name: $("#fName").value.trim(),
+    description: $("#fDesc").value.trim(),
+    feats: $("#fFeats").value.split("\n").map(s => s.trim()).filter(Boolean)
+  };
+  if (!text.name && !text.description && !text.feats.length){ toast("请先填写中文名称 / 描述 / 卖点"); return; }
+  const old = btn.textContent;
+  btn.disabled = true; btn.textContent = "翻译中…";
+  try {
+    const { status, data } = await api("/api/translate", { method: "POST", body: JSON.stringify({ target: ln, text }) });
+    if (status === 200 && data.ok && data.result){
+      const r = data.result;
+      $("#tr-" + ln + "-name").value = r.name || "";
+      $("#tr-" + ln + "-desc").value = r.description || "";
+      $("#tr-" + ln + "-feats").value = Array.isArray(r.feats) ? r.feats.join("\n") : "";
+      toast("已生成译文草稿，请核对后保存");
+    } else {
+      toast((data && data.error) || "机翻失败，可手工填写");
+    }
+  } catch (err){
+    toast("机翻服务暂不可用，可手工填写");
+  }
+  btn.disabled = false; btn.textContent = old;
+});
+
 $("#addBtn").addEventListener("click", () => openEdit(null));
 
 function openEdit(id){
@@ -441,6 +554,7 @@ function openEdit(id){
   $("#fImages").value = p && p.images && p.images.length ? p.images.join("\n") : "";
   $("#fDesc").value = p ? (p.description || "") : "";
   $("#fFeats").value = p ? (p.feats || []).join("\n") : "";
+  ["en", "ru"].forEach(ln => fillTr(ln, p && p.i18n ? p.i18n[ln] : null));
   syncShipFee();
   buildPicks(p ? p.image : "");
   updatePreview();
@@ -505,7 +619,8 @@ $("#productForm").addEventListener("submit", async (e) => {
     image: images[0] || mainImg,
     images,
     description: $("#fDesc").value.trim(),
-    feats: $("#fFeats").value.split("\n").map(s => s.trim()).filter(Boolean)
+    feats: $("#fFeats").value.split("\n").map(s => s.trim()).filter(Boolean),
+    i18n: collectI18n()
   };
   if (!body.name) { toast("请填写商品名称"); return; }
   if (!body.catName) { toast("请填写分类"); return; }

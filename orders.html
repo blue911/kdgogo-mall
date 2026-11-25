@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>订单查询 · KDGOGO商城</title>
+<title data-i18n-title="title_od">订单查询 · KDGOGO商城</title>
 <meta name="description" content="KDGOGO商城订单查询：按订单号查询订单状态与物流进度。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23E84E0A'/><text x='32' y='45' font-size='34' text-anchor='middle' fill='%23fff' font-family='serif'>K</text></svg>">
 <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap">
@@ -37,6 +37,11 @@ a{color:inherit;text-decoration:none}
 .back-link{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:500;color:var(--ink-2);padding:8px 12px;border-radius:9px;transition:color .15s,background .15s}
 .back-link:hover{color:var(--brand);background:var(--brand-soft)}
 .back-link svg{width:16px;height:16px}
+.nav-toggle{display:none;width:40px;height:40px;border:1px solid var(--line);border-radius:10px;background:#fff;align-items:center;justify-content:center;color:var(--ink-2)}
+.nav-toggle svg{width:20px;height:20px}
+.lang-select{height:38px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:0 10px;font-size:13px;color:var(--ink-2);cursor:pointer}
+[dir="rtl"] .order-status,[dir="rtl"] .ops{margin-left:0;margin-right:auto}
+[dir="rtl"] .order-foot .ops{margin-right:0}
 
 /* ===== 页面主区 ===== */
 .page{padding:44px 0 72px}
@@ -133,7 +138,9 @@ a{color:inherit;text-decoration:none}
 .toast.show{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
 
 @media (max-width:720px){
-  .main-nav{display:none}
+  .nav-toggle{display:inline-flex}
+  .main-nav{position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:2px;background:var(--paper);border-bottom:1px solid var(--line);padding:10px 20px;box-shadow:var(--shadow);display:none;z-index:41}
+  .main-nav.open{display:flex}
   .header-inner{height:auto;padding:12px 0;flex-wrap:wrap;gap:10px}
   .page{padding:26px 0 56px}
   .page-head h1{font-size:28px}
@@ -155,18 +162,37 @@ a{color:inherit;text-decoration:none}
 
 <header class="site-header">
   <div class="container header-inner">
-    <a class="brand" href="./" aria-label="KDGOGO商城首页">
+    <a class="brand" href="./" data-i18n-aria="brand" aria-label="KDGOGO商城首页">
       <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#E84E0A"/><path d="M16 8c-1.2 3.2-4 5-8 5.6V15c4.6.7 7.2 2.9 8 6.8 1-3.9 3.6-6.1 8.2-6.8v-1.4C20 13 17.2 11.2 16 8z" fill="#fff"/></svg>
-      KDGOGO商城
+      <span data-i18n="brand"></span>
     </a>
+    <button class="nav-toggle" id="navToggle" data-i18n-aria="menu" aria-label="菜单">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
     <nav class="main-nav" aria-label="主导航">
-      <a class="nav-link" href="./">首页</a>
-      <a class="nav-link" href="./checkout.html">去结算</a>
+      <a class="nav-link" href="./#home" data-i18n="nav_home"></a>
+      <a class="nav-link" href="./#shop" data-i18n="nav_all"></a>
+      <a class="nav-link" href="./checkout.html" data-i18n="checkout"></a>
+      <a class="nav-link" href="orders.html" data-i18n="nav_orders"></a>
     </nav>
     <div class="header-actions">
+      <select class="lang-select" id="langSelect" aria-label="语言">
+        <option value="zh">中文</option>
+        <option value="en">English</option>
+        <option value="ru">Русский</option>
+        <option value="es">Español</option>
+        <option value="ar">العربية</option>
+        <option value="fr">Français</option>
+        <option value="pt">Português</option>
+        <option value="de">Deutsch</option>
+        <option value="id">Bahasa Indonesia</option>
+        <option value="ja">日本語</option>
+        <option value="ko">한국어</option>
+        <option value="tr">Türkçe</option>
+      </select>
       <a class="back-link" href="./">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        返回商城
+        <span data-i18n="back_mall"></span>
       </a>
     </div>
   </div>
@@ -176,33 +202,33 @@ a{color:inherit;text-decoration:none}
   <section class="page">
     <div class="container">
       <div class="page-head">
-        <span class="page-eyebrow">KDGOGO商城 · 订单中心</span>
-        <h1>订单查询</h1>
-        <p>输入订单号即可查询订单状态与物流进度，本机订单会全部列在下方。</p>
+        <span class="page-eyebrow" data-i18n="od_eyebrow"></span>
+        <h1 data-i18n="od_title"></h1>
+        <p data-i18n="od_sub"></p>
       </div>
 
       <div class="search-bar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        <input type="search" id="searchInput" placeholder="输入订单号，如 OY20261029…" aria-label="按订单号查询">
-        <button class="search-btn" id="searchBtn">查询</button>
+        <input type="search" id="searchInput" data-i18n-ph="ph_order" data-i18n-aria="ph_order" placeholder="输入订单号，如 OY20261029…" aria-label="按订单号查询">
+        <button class="search-btn" id="searchBtn" data-i18n="search_btn"></button>
       </div>
       <div class="search-hint" id="searchHint"></div>
 
       <div class="status-tabs" id="statusTabs">
-        <button class="stab active" data-status="all">全部</button>
-        <button class="stab" data-status="pending">待支付</button>
-        <button class="stab" data-status="paid">已支付</button>
-        <button class="stab" data-status="shipped">已发货</button>
-        <button class="stab" data-status="done">已完成</button>
-        <button class="stab" data-status="closed">已关闭</button>
+        <button class="stab active" data-status="all" data-i18n="all"></button>
+        <button class="stab" data-status="pending" data-i18n="st_pending"></button>
+        <button class="stab" data-status="paid" data-i18n="st_paid"></button>
+        <button class="stab" data-status="shipped" data-i18n="st_shipped"></button>
+        <button class="stab" data-status="done" data-i18n="st_done"></button>
+        <button class="stab" data-status="closed" data-i18n="st_closed"></button>
       </div>
 
       <div id="listWrap"></div>
 
       <div class="empty-wrap hide" id="emptyWrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M5 7l1-4h12l1 4M6 7v13a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7"/><path d="M10 11v6M14 11v6"/></svg>
-        <b id="emptyTitle">暂无订单</b>
-        <span id="emptyDesc">下单后可在这里查询订单状态</span>
+        <b id="emptyTitle"></b>
+        <span id="emptyDesc"></span>
       </div>
     </div>
   </section>
@@ -212,33 +238,37 @@ a{color:inherit;text-decoration:none}
   <div class="container">
     <div class="footer-grid">
       <div class="footer-brand">
-        <b>KDGOGO商城</b>
-        <p>精选数码与生活好物，正品保障、极速发货，为你提供省心的线上购物体验。</p>
+        <b data-i18n="brand"></b>
+        <p data-i18n="footer_desc"></p>
       </div>
       <div class="footer-col">
-        <b>快速导航</b>
-        <a href="./">首页</a>
-        <a href="./checkout.html">去结算</a>
-        <a href="./orders.html">订单查询</a>
+        <b data-i18n="footer_nav"></b>
+        <a href="./#home" data-i18n="nav_home"></a>
+        <a href="./checkout.html" data-i18n="checkout"></a>
+        <a href="./orders.html" data-i18n="nav_orders"></a>
       </div>
       <div class="footer-col">
-        <b>商城信息</b>
-        <span class="f-item">关于我们</span>
-        <span class="f-item">售后政策</span>
-        <span class="f-item">联系客服</span>
-        <span class="f-item">配送说明</span>
+        <b data-i18n="footer_info"></b>
+        <span class="f-item" data-i18n="f_about"></span>
+        <span class="f-item" data-i18n="f_policy"></span>
+        <span class="f-item" data-i18n="f_contact"></span>
+        <span class="f-item" data-i18n="f_shipping"></span>
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 KDGOGO商城</span>
-      <span>KDGOGO Mall · 数码与生活好物精选</span>
+      <span data-i18n="footer_copy"></span>
+      <span data-i18n="footer_right"></span>
     </div>
   </div>
 </footer>
 
 <div class="toast" id="toast" role="status"></div>
 
+<script src="assets/i18n.js"></script>
 <script>
+/* ===== 多语言 ===== */
+const { t, applyLang, initLangSelect } = KDGOGO_I18N;
+
 /* ===== 工具 ===== */
 const $ = (s) => document.querySelector(s);
 const toastEl = $("#toast");
@@ -251,13 +281,9 @@ function toast(msg){
 }
 function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 
-/* ===== 状态定义 ===== */
-const STATUS = {
-  pending:{ label:"待支付", cls:"st-pending", text:"等待买家付款" },
-  paid:   { label:"已支付", cls:"st-paid",    text:"已付款，等待商家发货" },
-  shipped:{ label:"已发货", cls:"st-shipped", text:"包裹已发出，正在运输途中" },
-  done:   { label:"已完成", cls:"st-done",    text:"订单已完成，感谢购买" },
-  closed: { label:"已关闭", cls:"st-closed",  text:"订单已关闭（超时未付款）" }
+/* ===== 状态定义（样式类；文案走 i18n：st_<状态> / st_<状态>_t） ===== */
+const STATUS_CLS = {
+  pending:"st-pending", paid:"st-paid", shipped:"st-shipped", done:"st-done", closed:"st-closed"
 };
 const STATUS_ORDER = ["pending","paid","shipped","done","closed"];
 
@@ -303,10 +329,10 @@ function filterOrders(){
 
 function timelineFor(o){
   const steps = [
-    { key:"created",  title:"订单提交",      sub: fmtDate(o.created),  done:true, cur:o.status==="pending" },
-    { key:"paid",     title:"支付完成",      sub: fmtDate(o.paidAt),   done:!!o.paidAt, cur:o.status==="paid" },
-    { key:"shipped",  title:"商家发货",      sub: fmtDate(o.shippedAt),done:!!o.shippedAt, cur:o.status==="shipped" },
-    { key:"done",     title:"交易完成",      sub: fmtDate(o.doneAt),   done:!!o.doneAt, cur:o.status==="done" }
+    { key:"created",  title:t("tl_created"),  sub: fmtDate(o.created),  done:true, cur:o.status==="pending" },
+    { key:"paid",     title:t("tl_paid"),     sub: fmtDate(o.paidAt),   done:!!o.paidAt, cur:o.status==="paid" },
+    { key:"shipped",  title:t("tl_shipped"),  sub: fmtDate(o.shippedAt),done:!!o.shippedAt, cur:o.status==="shipped" },
+    { key:"done",     title:t("tl_done"),     sub: fmtDate(o.doneAt),   done:!!o.doneAt, cur:o.status==="done" }
   ];
   // 已关闭订单只展示到“订单提交”
   if (o.status === "closed") return steps.slice(0,1).map(s => ({...s, done:true, cur:false}));
@@ -317,8 +343,8 @@ function timelineFor(o){
 }
 
 function orderCard(o){
-  const st = STATUS[o.status] || STATUS.pending;
-  const names = o.items.map(i => i.name).join("、");
+  const stCls = STATUS_CLS[o.status] || STATUS_CLS.pending;
+  const names = o.items.map(i => i.name).join(", ");
   const totalQty = o.items.reduce((s,i)=>s+i.qty,0);
   const steps = timelineFor(o).map(s => `
     <div class="t-item ${s.done?'done':''} ${s.cur?'cur':''}">
@@ -330,39 +356,39 @@ function orderCard(o){
     </div>`).join("");
 
   const ops = o.status === "pending"
-    ? `<button class="mini-btn primary" data-pay="${o.no}">去支付</button>`
-    : (o.status === "paid" || o.status === "shipped" ? `<button class="mini-btn" data-advance="${o.no}">模拟推进到下一状态</button>` : "");
+    ? `<button class="mini-btn primary" data-pay="${o.no}">${t("pay_now")}</button>`
+    : (o.status === "paid" || o.status === "shipped" ? `<button class="mini-btn" data-advance="${o.no}">${t("advance")}</button>` : "");
 
   return `
   <article class="order-card" data-no="${esc(o.no)}">
     <div class="order-head">
       <span class="order-no">${esc(o.no)}</span>
       <span class="order-date">${fmtDate(o.created)}</span>
-      <span class="order-status ${st.cls}">${st.label}</span>
+      <span class="order-status ${stCls}">${t("st_" + o.status)}</span>
     </div>
     <div class="order-body">
       <img class="order-thumb" src="${esc(o.items[0].img)}" alt="">
       <div class="order-items-info">
         <div class="o-line">${esc(names)}</div>
-        <div class="o-meta">共 ${totalQty} 件 · 配送费 ¥${o.deliveryFee||0}</div>
+        <div class="o-meta">${t("qty_line", { n: totalQty, fee: o.deliveryFee || 0 })}</div>
       </div>
       <div class="o-total">
-        <div class="lbl">实付</div>
+        <div class="lbl">${t("paid_lbl")}</div>
         <b><small>¥</small>${o.total}</b>
       </div>
     </div>
     <div class="order-foot">
-      <span class="status-text">${st.text}</span>
+      <span class="status-text">${t("st_" + o.status + "_t")}</span>
       <span class="ops">
         <button class="toggle-btn" data-toggle="${esc(o.no)}">
           <svg class="toggle-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-          物流进度
+          ${t("track")}
         </button>
         ${ops}
       </span>
     </div>
     <div class="timeline">${steps}</div>
-    <div class="recv">收货信息：<b>${esc(o.receiver.name)}</b>　${esc(o.receiver.phone)}　${esc(o.receiver.addr)}</div>
+    <div class="recv">${t("recv_label")}<b>${esc(o.receiver.name)}</b>　${esc(o.receiver.phone)}　${esc(o.receiver.addr)}</div>
   </article>`;
 }
 
@@ -372,12 +398,12 @@ function render(){
   const empty = $("#emptyWrap");
   if (!list.length){
     empty.classList.remove("hide");
-    $("#emptyTitle").textContent = curStatus === "all" && !queryNo ? "暂无订单" : "未找到匹配的订单";
-    $("#emptyDesc").textContent = curStatus === "all" && !queryNo ? "下单后可在这里查询订单状态" : "请检查订单号是否正确，或更换筛选条件";
+    $("#emptyTitle").textContent = curStatus === "all" && !queryNo ? t("empty_title") : t("empty_title_none");
+    $("#emptyDesc").textContent = curStatus === "all" && !queryNo ? t("empty_desc") : t("empty_desc_none");
   } else {
     empty.classList.add("hide");
   }
-  $("#searchHint").textContent = queryNo ? `正在显示订单号包含「${queryNo}」的结果，共 ${list.length} 条` : "";
+  $("#searchHint").textContent = queryNo ? t("search_hint", { q: queryNo, n: list.length }) : "";
 }
 
 /* ===== 事件 ===== */
@@ -408,7 +434,7 @@ $("#listWrap").addEventListener("click", e => {
   const adv = e.target.closest("[data-advance]");
   if (adv){
     const o = orders.find(x => x.no === adv.dataset.advance);
-    if (o){ advanceOrder(o); saveOrders(); loadOrders(); render(); toast("已模拟推进订单状态"); }
+    if (o){ advanceOrder(o); saveOrders(); loadOrders(); render(); toast(t("toast_advanced")); }
   }
 });
 
@@ -418,6 +444,13 @@ if (sp.get("status")){ curStatus = sp.get("status"); }
 const q = (sp.get("q") || "").trim();
 if (q){ queryNo = q; $("#searchInput").value = q; }
 
+/* 移动端导航菜单 */
+const navToggle = $("#navToggle"), mainNav = $(".main-nav");
+navToggle.addEventListener("click", () => mainNav.classList.toggle("open"));
+mainNav.addEventListener("click", e => { if (e.target.closest(".nav-link")) mainNav.classList.remove("open"); });
+
+initLangSelect(() => render());
+applyLang();
 document.querySelectorAll(".stab").forEach(b => b.classList.toggle("active", b.dataset.status === curStatus));
 render();
 </script>

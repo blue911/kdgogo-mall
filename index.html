@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KDGOGO商城 · 数码与生活好物</title>
+<title data-i18n-title="title_home">KDGOGO商城 · 数码与生活好物</title>
 <meta name="description" content="KDGOGO商城：精选数码与生活好物，搜索筛选、购物车本地持久化，正品保障、极速发货。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23E84E0A'/><text x='32' y='45' font-size='34' text-anchor='middle' fill='%23fff' font-family='serif'>K</text></svg>">
 <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap">
@@ -56,6 +56,8 @@ a{color:inherit;text-decoration:none}
 .cart-badge{position:absolute;top:-6px;right:-6px;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:var(--brand);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:transform .15s}
 .cart-badge.hide{display:none}
 .lang-select{height:38px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:0 10px;font-size:13px;color:var(--ink-2);cursor:pointer}
+.nav-toggle{display:none;width:40px;height:40px;border:1px solid var(--line);border-radius:10px;background:#fff;align-items:center;justify-content:center;color:var(--ink-2)}
+.nav-toggle svg{width:20px;height:20px}
 
 /* RTL（阿拉伯语等从右向左语言）方向适配 */
 [dir="rtl"] .header-actions{margin-left:0;margin-right:auto}
@@ -217,8 +219,11 @@ a{color:inherit;text-decoration:none}
   .perks-inner{grid-template-columns:repeat(2,1fr)}
 }
 @media (max-width:760px){
-  .main-nav{display:none}
+  .nav-toggle{display:inline-flex}
+  .main-nav{position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:2px;background:var(--paper);border-bottom:1px solid var(--line);padding:10px 20px;box-shadow:var(--shadow);display:none;z-index:41}
+  .main-nav.open{display:flex}
   .header-inner{height:auto;padding:12px 0;flex-wrap:wrap;gap:10px}
+  .header-actions{flex-wrap:wrap}
   .search-box{order:3;flex-basis:100%}
   .search-box input{width:100%}
   .hero{padding:32px 0 10px}
@@ -249,10 +254,13 @@ a{color:inherit;text-decoration:none}
 
 <header class="site-header">
   <div class="container header-inner">
-    <a class="brand" href="#home" aria-label="KDGOGO商城首页">
+    <a class="brand" href="#home" data-i18n-aria="brand" aria-label="KDGOGO商城首页">
       <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#E84E0A"/><path d="M16 8c-1.2 3.2-4 5-8 5.6V15c4.6.7 7.2 2.9 8 6.8 1-3.9 3.6-6.1 8.2-6.8v-1.4C20 13 17.2 11.2 16 8z" fill="#fff"/></svg>
-      KDGOGO商城
+      <span data-i18n="brand"></span>
     </a>
+    <button class="nav-toggle" id="navToggle" data-i18n-aria="menu" aria-label="菜单">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
     <nav class="main-nav" aria-label="主导航">
       <button class="nav-link" data-goto="home" data-i18n="nav_home"></button>
       <button class="nav-link" data-goto="shop" data-i18n="nav_all"></button>
@@ -263,7 +271,7 @@ a{color:inherit;text-decoration:none}
     <div class="header-actions">
       <label class="search-box">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        <input type="search" id="searchInput" placeholder="搜索好物" aria-label="搜索商品">
+        <input type="search" id="searchInput" data-i18n-ph="search_ph" data-i18n-aria="search_ph" placeholder="搜索好物" aria-label="搜索商品">
       </label>
       <select class="lang-select" id="langSelect" aria-label="语言">
         <option value="zh">中文</option>
@@ -354,7 +362,7 @@ a{color:inherit;text-decoration:none}
   <div class="container">
     <div class="footer-grid">
       <div class="footer-brand">
-        <b>KDGOGO商城</b>
+        <b data-i18n="brand"></b>
         <p data-i18n="footer_desc"></p>
       </div>
       <div class="footer-col">
@@ -374,8 +382,8 @@ a{color:inherit;text-decoration:none}
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 KDGOGO商城</span>
-      <span>KDGOGO Mall · 数码与生活好物精选</span>
+      <span data-i18n="footer_copy"></span>
+      <span data-i18n="footer_right"></span>
     </div>
   </div>
 </footer>
@@ -436,302 +444,16 @@ a{color:inherit;text-decoration:none}
 
 <div class="toast" id="toast" role="status"></div>
 
+<script src="assets/i18n.js"></script>
 <script>
-/* ===== 多语言词典 ===== */
-const I18N = {
-  zh: {
-    nav_home:"首页", nav_all:"全部商品", nav_new:"新品尝鲜", nav_orders:"订单查询", nav_about:"关于本站",
-    admin:"管理", search_ph:"搜索好物，如“耳机”",
-    hero_eyebrow:"KDGOGO商城 · 数码好物精选",
-    hero_title_a:"把每一天，", hero_title_b:'过成<span class="accent">好物</span>合集',
-    hero_sub:"专为手游玩家打造的手机散热器，半导体制冷急速降温，长时间团战也不发烫；搭配多款数码散热好物，一站购齐。",
-    cta_shop:"立即选购", cta_about:"了解本站",
-    stat_items:"款精选好物", stat_rating:"平均用户评分", stat_ship:"极速发货",
-    perk1_t:"正品保障", perk1_d:"官方渠道，品质可溯",
-    perk2_t:"极速发货", perk2_d:"24 小时内出库",
-    perk3_t:"7 天无忧退", perk3_d:"拆封也可退换",
-    perk4_t:"在线客服", perk4_d:"工作时间实时响应",
-    catalog_title:"精选好物", count:"共 {n} 件好物", empty:"没有找到匹配的商品，换个关键词试试", score_suffix:" 分",
-    tag_new:"新品", tag_oos:"缺货", free_ship:"包邮", ship_fee:"运费 ¥{n}", add:"加入",
-    cart_title:"购物车", cart_empty:"购物车还是空的", go_shop:"去逛逛", subtotal:"合计",
-    checkout:"去结算", clear:"清空购物车", modal_add:"加入购物车", modal_note:"购物车数据保存在本机浏览器。",
-    removed:"已从购物车移除", added:"已将「{name}」加入购物车",
-    cart_empty_first:"购物车是空的，先去逛逛吧", cart_already_empty:"购物车已经是空的", cart_cleared:"购物车已清空",
-    footer_desc:"精选数码与生活好物，正品保障、极速发货，为你提供省心的线上购物体验。",
-    footer_nav:"快速导航", footer_info:"商城信息", f_about:"关于我们", f_policy:"售后政策", f_contact:"联系客服", f_shipping:"配送说明",
-    footer_copy:"© 2026 KDGOGO商城", footer_right:"KDGOGO Mall · 数码与生活好物精选",
-    all:"全部", oos:"暂时缺货"
-  },
-  en: {
-    nav_home:"Home", nav_all:"All Products", nav_new:"New Arrivals", nav_orders:"Orders", nav_about:"About",
-    admin:"Admin", search_ph:"Search products, e.g. earbuds",
-    hero_eyebrow:"KDGOGO MALL · Digital Picks",
-    hero_title_a:"Make every day,", hero_title_b:'a collection of <span class="accent">good finds</span>',
-    hero_sub:"Phone coolers built for mobile gamers: semiconductor cooling drops the temperature fast, keeping your phone cool through long gaming sessions. More digital cooling gear in one place.",
-    cta_shop:"Shop Now", cta_about:"About Us",
-    stat_items:"curated items", stat_rating:"avg. rating", stat_ship:"fast shipping",
-    perk1_t:"Genuine Products", perk1_d:"Official channels, traceable quality",
-    perk2_t:"Fast Dispatch", perk2_d:"Ships within 24 hours",
-    perk3_t:"7-Day Returns", perk3_d:"Returnable even after opening",
-    perk4_t:"Online Support", perk4_d:"Real-time replies in work hours",
-    catalog_title:"Featured Products", count:"{n} items found", empty:"No products match. Try another keyword.", score_suffix:" / 5",
-    tag_new:"New", tag_oos:"Out of stock", free_ship:"Free shipping", ship_fee:"Shipping ¥{n}", add:"Add",
-    cart_title:"Cart", cart_empty:"Your cart is empty", go_shop:"Browse", subtotal:"Subtotal",
-    checkout:"Checkout", clear:"Clear cart", modal_add:"Add to Cart", modal_note:"Cart data is stored in this browser.",
-    removed:"Removed from cart", added:"“{name}” added to cart",
-    cart_empty_first:"Cart is empty. Start browsing first.", cart_already_empty:"Cart is already empty", cart_cleared:"Cart cleared",
-    footer_desc:"Curated digital and lifestyle products: genuine quality and fast delivery for a worry-free shopping experience.",
-    footer_nav:"Quick Links", footer_info:"Store Info", f_about:"About Us", f_policy:"Returns Policy", f_contact:"Contact Support", f_shipping:"Delivery",
-    footer_copy:"© 2026 KDGOGO Mall", footer_right:"KDGOGO Mall · Digital & Lifestyle Picks",
-    all:"All", oos:"Out of stock"
-  },
-  ru: {
-    nav_home:"Главная", nav_all:"Все товары", nav_new:"Новинки", nav_orders:"Заказы", nav_about:"О магазине",
-    admin:"Админ", search_ph:"Поиск товаров, напр. наушники",
-    hero_eyebrow:"KDGOGO MALL · Цифровые гаджеты",
-    hero_title_a:"Каждый день —", hero_title_b:'подборка <span class="accent">полезных вещей</span>',
-    hero_sub:"Охладители для телефона для геймеров: полупроводниковое охлаждение быстро снижает температуру, смартфон не перегревается даже в долгих боях. Другие цифровые гаджеты — здесь.",
-    cta_shop:"Выбрать", cta_about:"О нас",
-    stat_items:"товаров в подборке", stat_rating:"средняя оценка", stat_ship:"быстрая отправка",
-    perk1_t:"Оригинал", perk1_d:"Официальные каналы, качество подтверждено",
-    perk2_t:"Быстрая отправка", perk2_d:"Отправка в течение 24 часов",
-    perk3_t:"Возврат 7 дней", perk3_d:"Можно вернуть после вскрытия",
-    perk4_t:"Поддержка онлайн", perk4_d:"Отвечаем в рабочее время",
-    catalog_title:"Популярное", count:"Найдено: {n}", empty:"Ничего не найдено. Попробуйте другой запрос.", score_suffix:" / 5",
-    tag_new:"Новинка", tag_oos:"Нет в наличии", free_ship:"Бесплатная доставка", ship_fee:"Доставка ¥{n}", add:"В корзину",
-    cart_title:"Корзина", cart_empty:"Корзина пуста", go_shop:"За покупками", subtotal:"Итого",
-    checkout:"Оформить", clear:"Очистить корзину", modal_add:"В корзину", modal_note:"Данные корзины хранятся в этом браузере.",
-    removed:"Удалено из корзины", added:"«{name}» в корзине",
-    cart_empty_first:"Корзина пуста, сначала выберите товары", cart_already_empty:"Корзина уже пуста", cart_cleared:"Корзина очищена",
-    footer_desc:"Отборные цифровые и бытовые товары: оригинальное качество и быстрая доставка.",
-    footer_nav:"Навигация", footer_info:"О магазине", f_about:"О нас", f_policy:"Возврат", f_contact:"Связаться с нами", f_shipping:"Доставка",
-    footer_copy:"© 2026 KDGOGO Mall", footer_right:"KDGOGO Mall · Цифровые и бытовые товары",
-    all:"Все", oos:"Нет в наличии"
-  },
-  es: {
-    nav_home:"Inicio", nav_all:"Todos los productos", nav_new:"Novedades", nav_orders:"Pedidos", nav_about:"Nosotros",
-    admin:"Admin", search_ph:"Buscar productos, p. ej. auriculares",
-    hero_eyebrow:"KDGOGO MALL · Selección digital",
-    hero_title_a:"Convierte cada día,", hero_title_b:'una colección de <span class="accent">buenas compras</span>',
-    hero_sub:"Refrigeradores para móvil diseñados para jugadores: el enfriamiento semiconductor baja la temperatura rápido, y el teléfono no se calienta en largas partidas. Más accesorios de refrigeración digital en un solo lugar.",
-    cta_shop:"Comprar ahora", cta_about:"Nosotros",
-    stat_items:"productos seleccionados", stat_rating:"valoración media", stat_ship:"envío rápido",
-    perk1_t:"Productos originales", perk1_d:"Canales oficiales, calidad verificada",
-    perk2_t:"Envío rápido", perk2_d:"Salida en 24 horas",
-    perk3_t:"Devolución 7 días", perk3_d:"Devuelto incluso sin precinto",
-    perk4_t:"Soporte online", perk4_d:"Respuesta en horario laboral",
-    catalog_title:"Productos destacados", count:"{n} productos", empty:"No se encontraron productos. Prueba otra búsqueda.", score_suffix:" / 5",
-    tag_new:"Nuevo", tag_oos:"Sin stock", free_ship:"Envío gratis", ship_fee:"Envío ¥{n}", add:"Añadir",
-    cart_title:"Carrito", cart_empty:"Tu carrito está vacío", go_shop:"Ver productos", subtotal:"Subtotal",
-    checkout:"Finalizar compra", clear:"Vaciar carrito", modal_add:"Añadir al carrito", modal_note:"Los datos del carrito se guardan en este navegador.",
-    removed:"Eliminado del carrito", added:"«{name}» añadido al carrito",
-    cart_empty_first:"El carrito está vacío, empieza a comprar.", cart_already_empty:"El carrito ya está vacío", cart_cleared:"Carrito vaciado",
-    footer_desc:"Productos digitales y de estilo de vida: calidad garantizada y envío rápido para una compra sin preocupaciones.",
-    footer_nav:"Enlaces", footer_info:"Información", f_about:"Sobre nosotros", f_policy:"Devoluciones", f_contact:"Contacto", f_shipping:"Entrega",
-    footer_copy:"© 2026 KDGOGO Mall", footer_right:"KDGOGO Mall · Digital y lifestyle",
-    all:"Todos", oos:"Sin stock"
-  },
-  ar: {
-    nav_home:"الرئيسية", nav_all:"جميع المنتجات", nav_new:"جديد", nav_orders:"الطلبات", nav_about:"من نحن",
-    admin:"المشرف", search_ph:"ابحث عن منتجات، مثل سماعات",
-    hero_eyebrow:"KDGOGO مول · مختارات رقمية",
-    hero_title_a:"اجعل كل يوم،", hero_title_b:'مجموعة من <span class="accent">الاختيارات الرائعة</span>',
-    hero_sub:"مبردات جوال مصممة للاعبين: تبريد أشباه الموصلات يخفض الحرارة بسرعة، ولا يسخن هاتفك حتى في الجلسات الطويلة. المزيد من معدات التبريد الرقمي في مكان واحد.",
-    cta_shop:"تسوق الآن", cta_about:"من نحن",
-    stat_items:"منتجات مختارة", stat_rating:"متوسط التقييم", stat_ship:"شحن سريع",
-    perk1_t:"منتجات أصلية", perk1_d:"قنوات رسمية، جودة موثوقة",
-    perk2_t:"شحن سريع", perk2_d:"يشحن خلال 24 ساعة",
-    perk3_t:"إرجاع 7 أيام", perk3_d:"يمكن الإرجاع بعد الفتح",
-    perk4_t:"دعم عبر الإنترنت", perk4_d:"ردود فورية في أوقات العمل",
-    catalog_title:"منتجات مميزة", count:"{n} منتج", empty:"لا توجد منتجات مطابقة. جرّب كلمة أخرى.", score_suffix:" / 5",
-    tag_new:"جديد", tag_oos:"نفد المخزون", free_ship:"شحن مجاني", ship_fee:"الشحن ¥{n}", add:"أضف",
-    cart_title:"السلة", cart_empty:"سلتك فارغة", go_shop:"تصفح", subtotal:"الإجمالي الفرعي",
-    checkout:"إتمام الطلب", clear:"إفراغ السلة", modal_add:"أضف إلى السلة", modal_note:"تُحفظ بيانات السلة في هذا المتصفح.",
-    removed:"أُزيل من السلة", added:"تمت إضافة «{name}» إلى السلة",
-    cart_empty_first:"السلة فارغة، تصفح المنتجات أولاً.", cart_already_empty:"السلة فارغة بالفعل", cart_cleared:"تم إفراغ السلة",
-    footer_desc:"منتجات رقمية ومنزلية مختارة: جودة أصلية وتوصيل سريع لتجربة تسوق مريحة.",
-    footer_nav:"روابط سريعة", footer_info:"معلومات المتجر", f_about:"من نحن", f_policy:"سياسة الإرجاع", f_contact:"تواصل مع الدعم", f_shipping:"التوصيل",
-    footer_copy:"© 2026 KDGOGO مول", footer_right:"KDGOGO Mall · منتجات رقمية ومنزلية",
-    all:"الكل", oos:"غير متوفر"
-  },
-  fr: {
-    nav_home:"Accueil", nav_all:"Tous les produits", nav_new:"Nouveautés", nav_orders:"Commandes", nav_about:"À propos",
-    admin:"Admin", search_ph:"Rechercher un produit, ex. écouteurs",
-    hero_eyebrow:"KDGOGO MALL · Sélection digitale",
-    hero_title_a:"Faites de chaque jour,", hero_title_b:'une collection de <span class="accent">bonnes trouvailles</span>',
-    hero_sub:"Ventilateurs pour téléphone conçus pour les joueurs : le refroidissement semi-conducteur fait baisser la température vite, et le téléphone reste frais pendant les longues sessions. Plus d’accessoires de refroidissement au même endroit.",
-    cta_shop:"Acheter", cta_about:"À propos",
-    stat_items:"articles sélectionnés", stat_rating:"note moyenne", stat_ship:"livraison rapide",
-    perk1_t:"Produits authentiques", perk1_d:"Canaux officiels, qualité traçable",
-    perk2_t:"Expédition rapide", perk2_d:"Expédié sous 24 h",
-    perk3_t:"Retour 7 jours", perk3_d:"Retour possible même après ouverture",
-    perk4_t:"Support en ligne", perk4_d:"Réponses pendant les heures ouvrables",
-    catalog_title:"Produits en vedette", count:"{n} articles", empty:"Aucun produit trouvé. Essayez un autre mot-clé.", score_suffix:" / 5",
-    tag_new:"Nouveau", tag_oos:"Rupture", free_ship:"Livraison offerte", ship_fee:"Livraison ¥{n}", add:"Ajouter",
-    cart_title:"Panier", cart_empty:"Votre panier est vide", go_shop:"Parcourir", subtotal:"Sous-total",
-    checkout:"Commander", clear:"Vider le panier", modal_add:"Ajouter au panier", modal_note:"Les données du panier sont enregistrées dans ce navigateur.",
-    removed:"Retiré du panier", added:"« {name} » ajouté au panier",
-    cart_empty_first:"Le panier est vide, commencez vos achats.", cart_already_empty:"Le panier est déjà vide", cart_cleared:"Panier vidé",
-    footer_desc:"Produits digitaux et lifestyle sélectionnés : qualité garantie et livraison rapide pour un achat serein.",
-    footer_nav:"Liens rapides", footer_info:"Infos boutique", f_about:"À propos", f_policy:"Retours", f_contact:"Contact support", f_shipping:"Livraison",
-    footer_copy:"© 2026 KDGOGO Mall", footer_right:"KDGOGO Mall · Digital & Lifestyle",
-    all:"Tous", oos:"Rupture de stock"
-  },
-  pt: {
-    nav_home:"Início", nav_all:"Todos os produtos", nav_new:"Novidades", nav_orders:"Pedidos", nav_about:"Sobre",
-    admin:"Admin", search_ph:"Buscar produtos, ex. fones",
-    hero_eyebrow:"KDGOGO MALL · Seleção digital",
-    hero_title_a:"Faça de cada dia,", hero_title_b:'uma coleção de <span class="accent">boas compras</span>',
-    hero_sub:"Coolers para celular feitos para gamers: o resfriamento semicondutor abaixa a temperatura rápido, e o aparelho não esquenta em longas partidas. Mais acessórios de resfriamento digital em um só lugar.",
-    cta_shop:"Comprar agora", cta_about:"Sobre nós",
-    stat_items:"itens selecionados", stat_rating:"avaliação média", stat_ship:"envio rápido",
-    perk1_t:"Produtos originais", perk1_d:"Canais oficiais, qualidade rastreável",
-    perk2_t:"Envio rápido", perk2_d:"Enviado em 24 horas",
-    perk3_t:"Devolução 7 dias", perk3_d:"Devolve mesmo após a abertura",
-    perk4_t:"Suporte online", perk4_d:"Respostas no horário comercial",
-    catalog_title:"Produtos em destaque", count:"{n} itens", empty:"Nenhum produto encontrado. Tente outra busca.", score_suffix:" / 5",
-    tag_new:"Novo", tag_oos:"Sem estoque", free_ship:"Frete grátis", ship_fee:"Frete ¥{n}", add:"Adicionar",
-    cart_title:"Carrinho", cart_empty:"Seu carrinho está vazio", go_shop:"Ver produtos", subtotal:"Subtotal",
-    checkout:"Finalizar compra", clear:"Esvaziar carrinho", modal_add:"Adicionar ao carrinho", modal_note:"Os dados do carrinho ficam neste navegador.",
-    removed:"Removido do carrinho", added:"«{name}» adicionado ao carrinho",
-    cart_empty_first:"O carrinho está vazio, comece a comprar.", cart_already_empty:"O carrinho já está vazio", cart_cleared:"Carrinho esvaziado",
-    footer_desc:"Produtos digitais e de lifestyle selecionados: qualidade garantida e entrega rápida para uma compra tranquila.",
-    footer_nav:"Links", footer_info:"Informações", f_about:"Sobre nós", f_policy:"Devoluções", f_contact:"Falar conosco", f_shipping:"Entrega",
-    footer_copy:"© 2026 KDGOGO Mall", footer_right:"KDGOGO Mall · Digital e lifestyle",
-    all:"Todos", oos:"Sem estoque"
-  },
-  de: {
-    nav_home:"Start", nav_all:"Alle Produkte", nav_new:"Neuheiten", nav_orders:"Bestellungen", nav_about:"Über uns",
-    admin:"Admin", search_ph:"Produkte suchen, z. B. Kopfhörer",
-    hero_eyebrow:"KDGOGO MALL · Digitale Auswahl",
-    hero_title_a:"Mach jeden Tag,", hero_title_b:'eine Sammlung <span class="accent">guter Fundstücke</span>',
-    hero_sub:"Handy-Kühler für Gamer: die Halbleiterkühlung senkt die Temperatur schnell, das Handy bleibt auch in langen Sessions kühl. Weiteres digitales Kühlzubehör an einem Ort.",
-    cta_shop:"Jetzt shoppen", cta_about:"Über uns",
-    stat_items:"ausgewählte Artikel", stat_rating:"Ø Bewertung", stat_ship:"schneller Versand",
-    perk1_t:"Originalware", perk1_d:"Offizielle Kanäle, nachverfolgbare Qualität",
-    perk2_t:"Schneller Versand", perk2_d:"Versand innerhalb von 24 Stunden",
-    perk3_t:"7 Tage Rückgabe", perk3_d:"Auch nach dem Öffnen zurückgebbar",
-    perk4_t:"Online Support", perk4_d:"Antworten während der Geschäftszeit",
-    catalog_title:"Empfohlene Produkte", count:"{n} Artikel", empty:"Keine Produkte gefunden. Anderen Suchbegriff versuchen.", score_suffix:" / 5",
-    tag_new:"Neu", tag_oos:"Ausverkauft", free_ship:"Versand kostenlos", ship_fee:"Versand ¥{n}", add:"Hinzufügen",
-    cart_title:"Warenkorb", cart_empty:"Ihr Warenkorb ist leer", go_shop:"Stöbern", subtotal:"Zwischensumme",
-    checkout:"Zur Kasse", clear:"Warenkorb leeren", modal_add:"In den Warenkorb", modal_note:"Warenkorbdaten werden in diesem Browser gespeichert.",
-    removed:"Aus dem Warenkorb entfernt", added:"„{name}“ im Warenkorb",
-    cart_empty_first:"Warenkorb ist leer. Stöbern Sie zuerst.", cart_already_empty:"Warenkorb ist bereits leer", cart_cleared:"Warenkorb geleert",
-    footer_desc:"Ausgewählte digitale Lifestyle-Produkte: geprüfte Qualität und schnelle Lieferung für sorgenfreies Einkaufen.",
-    footer_nav:"Schnellzugriff", footer_info:"Shop-Info", f_about:"Über uns", f_policy:"Rückgabe", f_contact:"Support kontaktieren", f_shipping:"Lieferung",
-    footer_copy:"© 2026 KDGOGO Mall", footer_right:"KDGOGO Mall · Digital & Lifestyle",
-    all:"Alle", oos:"Ausverkauft"
-  },
-  id: {
-    nav_home:"Beranda", nav_all:"Semua Produk", nav_new:"Terbaru", nav_orders:"Pesanan", nav_about:"Tentang",
-    admin:"Admin", search_ph:"Cari produk, mis. earbuds",
-    hero_eyebrow:"KDGOGO MALL · Pilihan Digital",
-    hero_title_a:"Jadikan setiap hari,", hero_title_b:'kumpulan <span class="accent">barang pilihan</span>',
-    hero_sub:"Pendingin HP untuk gamer: pendingin semikonduktor menurunkan suhu dengan cepat, ponsel tetap adem saat main lama. Perlengkapan pendingin digital lainnya ada di sini.",
-    cta_shop:"Belanja Sekarang", cta_about:"Tentang Kami",
-    stat_items:"produk pilihan", stat_rating:"rata-rata rating", stat_ship:"pengiriman cepat",
-    perk1_t:"Produk Original", perk1_d:"Saluran resmi, kualitas terverifikasi",
-    perk2_t:"Kirim Cepat", perk2_d:"Dikirim dalam 24 jam",
-    perk3_t:"Retur 7 Hari", perk3_d:"Bisa retur setelah dibuka",
-    perk4_t:"Layanan Online", perk4_d:"Balasan di jam kerja",
-    catalog_title:"Produk Pilihan", count:"{n} produk", empty:"Tidak ada produk cocok. Coba kata kunci lain.", score_suffix:" / 5",
-    tag_new:"Baru", tag_oos:"Stok habis", free_ship:"Gratis ongkir", ship_fee:"Ongkir ¥{n}", add:"Tambah",
-    cart_title:"Keranjang", cart_empty:"Keranjang Anda kosong", go_shop:"Jelajahi", subtotal:"Subtotal",
-    checkout:"Checkout", clear:"Kosongkan keranjang", modal_add:"Tambah ke keranjang", modal_note:"Data keranjang tersimpan di browser ini.",
-    removed:"Dihapus dari keranjang", added:"“{name}” ditambahkan ke keranjang",
-    cart_empty_first:"Keranjang kosong, mulai belanja dulu.", cart_already_empty:"Keranjang sudah kosong", cart_cleared:"Keranjang dikosongkan",
-    footer_desc:"Produk digital dan lifestyle pilihan: kualitas terjamin dan pengiriman cepat untuk belanja yang nyaman.",
-    footer_nav:"Tautan", footer_info:"Info Toko", f_about:"Tentang Kami", f_policy:"Kebijakan Retur", f_contact:"Hubungi Dukungan", f_shipping:"Pengiriman",
-    footer_copy:"© 2026 KDGOGO Mall", footer_right:"KDGOGO Mall · Digital & Lifestyle",
-    all:"Semua", oos:"Stok habis"
-  },
-  ja: {
-    nav_home:"ホーム", nav_all:"すべての商品", nav_new:"新着商品", nav_orders:"注文履歴", nav_about:"私たちについて",
-    admin:"管理", search_ph:"商品を検索（例：イヤホン）",
-    hero_eyebrow:"KDGOGO MALL · デジタル厳選",
-    hero_title_a:"毎日を、", hero_title_b:'<span class="accent">良いもの</span>コレクションに',
-    hero_sub:"ゲーマー向けスマホ冷却ファン：半導体冷却で素早く温度を下げ、長時間のプレイでも発熱を抑えます。その他のデジタル冷却アイテムもここでチェック。",
-    cta_shop:"今すぐ購入", cta_about:"私たちについて",
-    stat_items:"厳選アイテム", stat_rating:"平均評価", stat_ship:"迅速発送",
-    perk1_t:"正規品保証", perk1_d:"公式ルート、品質追跡可能",
-    perk2_t:"迅速発送", perk2_d:"24時間以内に出荷",
-    perk3_t:"7日間返品可", perk3_d:"開封後も返品可能",
-    perk4_t:"オンラインサポート", perk4_d:"営業時間内に即時対応",
-    catalog_title:"おすすめ商品", count:"{n} 件", empty:"一致する商品がありません。別のキーワードをお試しください。", score_suffix:" / 5",
-    tag_new:"新着", tag_oos:"品切れ", free_ship:"送料無料", ship_fee:"送料 ¥{n}", add:"追加",
-    cart_title:"カート", cart_empty:"カートは空です", go_shop:"商品を見る", subtotal:"小計",
-    checkout:"レジへ進む", clear:"カートを空にする", modal_add:"カートに追加", modal_note:"カートデータはこのブラウザに保存されます。",
-    removed:"カートから削除しました", added:"「{name}」をカートに追加しました",
-    cart_empty_first:"カートは空です。まず商品をご覧ください。", cart_already_empty:"カートはすでに空です", cart_cleared:"カートを空にしました",
-    footer_desc:"厳選したデジタル・ライフスタイル商品。品質保証と迅速な配送で、安心のお買い物を。",
-    footer_nav:"クイックリンク", footer_info:"店舗情報", f_about:"私たちについて", f_policy:"返品ポリシー", f_contact:"サポートに連絡", f_shipping:"配送について",
-    footer_copy:"© 2026 KDGOGO Mall", footer_right:"KDGOGO Mall · Digital & Lifestyle",
-    all:"すべて", oos:"品切れ"
-  },
-  ko: {
-    nav_home:"홈", nav_all:"전체 상품", nav_new:"신상품", nav_orders:"주문 조회", nav_about:"소개",
-    admin:"관리", search_ph:"상품 검색 (예: 이어폰)",
-    hero_eyebrow:"KDGOGO MALL · 디지털 엄선",
-    hero_title_a:"매일을,", hero_title_b:'<span class="accent">좋은 아이템</span> 컬렉션으로',
-    hero_sub:"게이머용 휴대폰 쿨러: 반도체 냉각으로 빠르게 온도를 낮춰 장시간 게임에도 발열을 잡아줍니다. 다른 디지털 냉각 액세서리도 한곳에서 확인하세요.",
-    cta_shop:"지금 구매", cta_about:"소개",
-    stat_items:"엄선 상품", stat_rating:"평균 평점", stat_ship:"빠른 배송",
-    perk1_t:"정품 보장", perk1_d:"공식 채널, 품질 검증",
-    perk2_t:"빠른 출고", perk2_d:"24시간 내 출고",
-    perk3_t:"7일 반품", perk3_d:"개봉 후에도 반품 가능",
-    perk4_t:"온라인 지원", perk4_d:"업무 시간 내 즉시 응답",
-    catalog_title:"추천 상품", count:"상품 {n}개", empty:"일치하는 상품이 없습니다. 다른 키워드를 시도해 보세요.", score_suffix:" / 5",
-    tag_new:"신상품", tag_oos:"품절", free_ship:"무료 배송", ship_fee:"배송비 ¥{n}", add:"추가",
-    cart_title:"장바구니", cart_empty:"장바구니가 비어 있습니다", go_shop:"둘러보기", subtotal:"소계",
-    checkout:"결제하기", clear:"장바구니 비우기", modal_add:"장바구니에 담기", modal_note:"장바구니 데이터는 이 브라우저에 저장됩니다.",
-    removed:"장바구니에서 삭제됨", added:"“{name}”이(가) 장바구니에 담겼습니다",
-    cart_empty_first:"장바구니가 비어 있습니다. 먼저 상품을 둘러보세요.", cart_already_empty:"장바구니가 이미 비어 있습니다", cart_cleared:"장바구니를 비웠습니다",
-    footer_desc:"엄선된 디지털·리빙 상품: 검증된 품질과 빠른 배송으로 안심 쇼핑을 제공합니다.",
-    footer_nav:"빠른 링크", footer_info:"매장 정보", f_about:"회사 소개", f_policy:"반품 정책", f_contact:"고객 지원 문의", f_shipping:"배송 안내",
-    footer_copy:"© 2026 KDGOGO Mall", footer_right:"KDGOGO Mall · Digital & Lifestyle",
-    all:"전체", oos:"품절"
-  },
-  tr: {
-    nav_home:"Ana Sayfa", nav_all:"Tüm Ürünler", nav_new:"Yeni Ürünler", nav_orders:"Siparişler", nav_about:"Hakkımızda",
-    admin:"Yönetici", search_ph:"Ürün ara, örn. kulaklık",
-    hero_eyebrow:"KDGOGO MALL · Dijital Seçki",
-    hero_title_a:"Her günü,", hero_title_b:'<span class="accent">iyi ürünler</span> koleksiyonuna dönüştür',
-    hero_sub:"Oyuncular için telefon soğutucuları: yarı iletken soğutma sıcaklığı hızla düşürür, uzun oyun seanslarında telefon ısınmaz. Diğer dijital soğutma aksesuarları tek yerde.",
-    cta_shop:"Hemen Al", cta_about:"Hakkımızda",
-    stat_items:"seçili ürün", stat_rating:"ortalama puan", stat_ship:"hızlı kargo",
-    perk1_t:"Orijinal Ürün", perk1_d:"Resmi kanallar, izlenebilir kalite",
-    perk2_t:"Hızlı Kargo", perk2_d:"24 saat içinde kargoda",
-    perk3_t:"7 Gün İade", perk3_d:"Açıldıktan sonra da iade edilebilir",
-    perk4_t:"Çevrimiçi Destek", perk4_d:"Çalışma saatlerinde anında yanıt",
-    catalog_title:"Öne Çıkanlar", count:"{n} ürün", empty:"Eşleşen ürün yok. Farklı bir kelime deneyin.", score_suffix:" / 5",
-    tag_new:"Yeni", tag_oos:"Stok yok", free_ship:"Ücretsiz kargo", ship_fee:"Kargo ¥{n}", add:"Ekle",
-    cart_title:"Sepet", cart_empty:"Sepetiniz boş", go_shop:"Göz At", subtotal:"Ara Toplam",
-    checkout:"Ödemeye Geç", clear:"Sepeti boşalt", modal_add:"Sepete ekle", modal_note:"Sepet verileri bu tarayıcıda saklanır.",
-    removed:"Sepetten çıkarıldı", added:"«{name}» sepete eklendi",
-    cart_empty_first:"Sepet boş, önce ürünlere göz atın.", cart_already_empty:"Sepet zaten boş", cart_cleared:"Sepet boşaltıldı",
-    footer_desc:"Seçili dijital ve yaşam ürünleri: garantili kalite ve hızlı teslimatla sorunsuz alışveriş.",
-    footer_nav:"Hızlı Bağlantılar", footer_info:"Mağaza Bilgisi", f_about:"Hakkımızda", f_policy:"İade Politikası", f_contact:"Destek ile İletişim", f_shipping:"Teslimat",
-    footer_copy:"© 2026 KDGOGO Mall", footer_right:"KDGOGO Mall · Digital & Lifestyle",
-    all:"Tümü", oos:"Stokta yok"
-  }
-};
+/* ===== 多语言（共享脚本 assets/i18n.js） ===== */
+const { t, applyLang, initLangSelect, pickProd, pickFeats, pickCat } = KDGOGO_I18N;
+/* 商品文案取值（含回退）：名称 / 描述 / 分类 / 卖点 */
+const pName = p => pickProd(p, "name");
+const pDesc = p => pickProd(p, "description") || p.desc || "";
+const pCat = p => pickCat(p);
+const pFeats = p => pickFeats(p);
 
-let lang = localStorage.getItem("kdgogo-lang") || "zh";
-if (!I18N[lang]) lang = "zh";
-function t(key, vars){
-  let s = (I18N[lang] && I18N[lang][key]) || (I18N.zh[key]) || key;
-  if (vars) Object.entries(vars).forEach(([k,v]) => { s = s.replace("{"+k+"}", v); });
-  return s;
-}
-function applyLang(){
-  document.documentElement.lang = lang === "zh" ? "zh-CN" : lang;
-  document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
-  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
-  document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
-  $("#searchInput").placeholder = t("search_ph");
-  $("#langSelect").value = lang;
-}
 
 /* ===== 数据 ===== */
 /* 内置演示数据：仅在后端 API 不可用（断网/数据库未配置）时回退使用 */
@@ -810,7 +532,7 @@ function toast(msg){
 /* ===== 分类（动态：来自后台已有商品） ===== */
 function catList(){
   const map = new Map();
-  PRODUCTS.forEach(p => { if (!map.has(p.cat)) map.set(p.cat, p.catName); });
+  PRODUCTS.forEach(p => { if (!map.has(p.cat)) map.set(p.cat, pCat(p)); });
   return [...map.entries()].map(([slug,name]) => ({ slug, name }));
 }
 
@@ -830,7 +552,7 @@ function visibleProducts(){
     if (p.on_sale === false) return false;
     if (filter === "new" && !p.isNew) return false;
     if (filter !== "all" && filter !== "new" && p.cat !== filter) return false;
-    if (q && !(p.name.toLowerCase().includes(q) || p.catName.includes(query.trim()))) return false;
+    if (q && !(pName(p).toLowerCase().includes(q) || pCat(p).toLowerCase().includes(query.trim()))) return false;
     return true;
   });
 }
@@ -850,16 +572,16 @@ function renderGrid(){
     const tag = oos
       ? `<span class="card-tag oos">${t("tag_oos")}</span>`
       : p.isNew ? `<span class="card-tag hot">${t("tag_new")}</span>`
-      : `<span class="card-tag">${esc(p.catName)}</span>`;
+      : `<span class="card-tag">${esc(pCat(p))}</span>`;
     const sub = [p.brand, p.model].filter(Boolean).join(" · ");
     return `
     <article class="card" data-id="${p.id}">
       <div class="card-media">
         ${tag}
-        <img src="${p.img}" alt="${esc(p.name)}" loading="lazy">
+        <img src="${p.img}" alt="${esc(pName(p))}" loading="lazy">
       </div>
       <div class="card-body">
-        <h3 class="card-name">${esc(p.name)}</h3>
+        <h3 class="card-name">${esc(pName(p))}</h3>
         ${sub ? `<div class="card-sub">${esc(sub)}</div>` : ""}
         <div class="card-rating">${starsHtml(p.rating)}<span class="card-score">${p.rating.toFixed(1)}${t("score_suffix")}</span></div>
         <div class="ship-badge">${shipText(p)}</div>
@@ -901,9 +623,9 @@ function renderCart(){
     const p = PRODUCTS.find(x => x.id == id);
     if (!p) return "";
     return `<div class="cart-item">
-      <img src="${p.img}" alt="${esc(p.name)}">
+      <img src="${p.img}" alt="${esc(pName(p))}">
       <div>
-        <div class="cart-item-name">${esc(p.name)}</div>
+        <div class="cart-item-name">${esc(pName(p))}</div>
         <div class="cart-item-price">¥${p.price} × ${qty}</div>
       </div>
       <div class="cart-item-right">
@@ -925,7 +647,7 @@ function addToCart(id, qty){
   if ((p.stock ?? 1) <= 0) { toast(t("oos")); return; }
   cart[id] = (cart[id] || 0) + qty;
   saveCart();
-  toast(t("added", {name: p.name}));
+  toast(t("added", {name: pName(p)}));
 }
 
 /* ===== 详情弹窗 ===== */
@@ -936,12 +658,12 @@ function openModal(id){
   modalImages = (p.images && p.images.length) ? p.images : [p.img];
   modalImgIdx = 0;
   showModalImage();
-  $("#modalCat").textContent = p.catName + (p.isNew ? " · " + t("tag_new") : "");
-  $("#modalName").textContent = p.name;
+  $("#modalCat").textContent = pCat(p) + (p.isNew ? " · " + t("tag_new") : "");
+  $("#modalName").textContent = pName(p);
   const sub = [p.brand, p.model].filter(Boolean).join(" · ");
   $("#modalMeta").textContent = sub + (sub ? " · " : "") + shipText(p) + ((p.stock ?? 1) <= 0 ? " · " + t("tag_oos") : "");
-  $("#modalDesc").textContent = p.desc;
-  $("#modalFeats").innerHTML = p.feats.map(f => `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>${esc(f)}</li>`).join("");
+  $("#modalDesc").textContent = pDesc(p);
+  $("#modalFeats").innerHTML = pFeats(p).map(f => `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>${esc(f)}</li>`).join("");
   $("#modalPrice").innerHTML = priceHtml(p).replace('class="price"', 'class="modal-price"');
   $("#modalRating").innerHTML = starsHtml(p.rating) + `<span class="card-score">${p.rating.toFixed(1)}${t("score_suffix")}</span>`;
   $("#qtyVal").textContent = 1;
@@ -1031,11 +753,12 @@ $("#modalAdd").addEventListener("click", () => { if(modalId) addToCart(modalId, 
 $("#checkoutBtn").addEventListener("click", () => { if(!cartCount()){ toast(t("cart_empty_first")); return; } location.href = "checkout.html"; });
 $("#clearBtn").addEventListener("click", () => { if(!cartCount()){ toast(t("cart_already_empty")); return; } cart = {}; saveCart(); toast(t("cart_cleared")); });
 
-$("#langSelect").addEventListener("change", e => {
-  lang = e.target.value;
-  localStorage.setItem("kdgogo-lang", lang);
-  applyLang(); renderChips(); renderGrid(); renderCart();
-});
+initLangSelect(() => { renderChips(); renderGrid(); renderCart(); });
+
+/* 移动端导航菜单 */
+const navToggle = $("#navToggle"), mainNav = $(".main-nav");
+navToggle.addEventListener("click", () => mainNav.classList.toggle("open"));
+mainNav.addEventListener("click", e => { if (e.target.closest(".nav-link")) mainNav.classList.remove("open"); });
 
 document.addEventListener("keydown", e => { if (e.key === "Escape"){ closeModal(); closeDrawer(); } });
 
@@ -1054,9 +777,11 @@ async function loadProducts(){
     const data = await res.json();
     if (data.ok && Array.isArray(data.products) && data.products.length){
       PRODUCTS = data.products.map(p => ({
-        id: p.id, name: p.name, cat: p.category, catName: p.catName,
+        id: p.id, name: p.name, category: p.category, cat: p.category, catName: p.catName,
+        description: p.description || "", desc: p.description || "",
+        i18n: p.i18n || {},
         price: p.price, rating: p.rating, isNew: !!p.isNew,
-        img: p.image || "assets/hero.jpg", desc: p.description || "",
+        img: p.image || "assets/hero.jpg",
         feats: Array.isArray(p.feats) ? p.feats : [],
         images: Array.isArray(p.images) && p.images.length ? p.images : [p.image || "assets/hero.jpg"],
         on_sale: !!p.on_sale,
