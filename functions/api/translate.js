@@ -5,7 +5,7 @@
 // 通道可替换：默认 Cloudflare Workers AI；后续可在 env 配置 TRANSLATE_PROVIDER=deepl|google 并补对应调用。
 import { json, isAuthed, I18N_LANGS } from "../_lib.js";
 
-const WORKERS_AI_MODEL = "@cf/meta/m2m100-12b";
+const WORKERS_AI_MODEL = "@cf/meta/m2m100-1.2b";
 
 async function translateWorkersAI(env, text, target) {
   if (!env.AI) throw new Error("NO_AI_BINDING");
