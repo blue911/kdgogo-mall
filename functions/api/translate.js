@@ -50,10 +50,9 @@ export async function onRequest(context) {
     ]);
     return json({ ok: true, result: { name: tn, description: td, feats: tFeats } });
   } catch (err) {
-    const detail = err && (err.message || err.name || String(err));
     const msg = (err && err.message === "NO_AI_BINDING")
       ? "未配置翻译通道（需在 Cloudflare 绑定 Workers AI，变量名 AI），可手工填写译文"
-      : "机翻服务暂不可用：" + detail + "，可手工填写译文";
+      : "机翻服务暂不可用，可手工填写译文";
     return json({ ok: false, error: msg }, 503);
   }
 }
