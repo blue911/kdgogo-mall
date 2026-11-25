@@ -122,6 +122,17 @@ td img.thumb{width:52px;height:52px;border-radius:9px;object-fit:cover;backgroun
 .pick-imgs img{width:44px;height:44px;object-fit:cover;border-radius:8px;border:2px solid var(--line);cursor:pointer;transition:border .15s}
 .pick-imgs img:hover,.pick-imgs img.sel{border-color:var(--brand)}
 .preview{width:86px;height:86px;object-fit:cover;border-radius:10px;border:1px solid var(--line);background:var(--warm);margin-top:8px;display:none}
+.gal-grid{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.gal-item{position:relative;width:74px;height:74px}
+.gal-item img{width:74px;height:74px;object-fit:cover;border-radius:10px;border:1px solid var(--line);background:var(--warm);cursor:pointer;transition:border-color .15s}
+.gal-item.main img{border-color:var(--brand);border-width:2px}
+.gal-badge{position:absolute;left:4px;top:4px;background:var(--brand);color:#fff;font-size:10px;line-height:1;padding:2px 6px;border-radius:6px}
+.gal-del{position:absolute;right:4px;top:4px;width:20px;height:20px;border:none;border-radius:6px;background:rgba(33,32,30,.6);color:#fff;font-size:13px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.gal-del:hover{background:rgba(33,32,30,.85)}
+.gal-add{width:74px;height:74px;border:1.5px dashed var(--line);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--muted);cursor:pointer;font-size:12px;transition:border-color .15s,color .15s}
+.gal-add:hover{border-color:var(--brand);color:var(--brand)}
+.gal-add.busy{pointer-events:none;opacity:.6}
+.gal-add .plus{font-size:24px;line-height:1}
 .price-old{color:var(--muted);text-decoration:line-through;font-size:12px}
 
 /* Toast */
@@ -259,8 +270,9 @@ td img.thumb{width:52px;height:52px;border-radius:9px;object-fit:cover;backgroun
           <img class="preview" id="imgPreview" alt="图片预览">
         </div>
         <div class="field full">
-          <label for="fImages">图集（每行一条，可选；第一张作为主图）</label>
-          <textarea id="fImages" placeholder="https://…/img2.jpg&#10;https://…/img3.jpg"></textarea>
+          <label>图集（可选；第一张为主图，点击缩略图设为主图，点 × 删除）</label>
+          <div class="gal-grid" id="galGrid"></div>
+          <input type="file" id="galFile" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" multiple hidden>
         </div>
         <div class="field full">
           <label for="fDesc">一句话描述</label>
@@ -332,6 +344,7 @@ const loginView = $("#loginView"), mainView = $("#mainView");
 const tbody = $("#tbody"), emptyState = $("#emptyState"), dbBanner = $("#dbBanner");
 let token = "";
 let products = [];
+let gallery = [];
 const EXISTING_IMGS = ["assets/p01-earbuds.jpg","assets/p02-watch.jpg","assets/p03-speaker.jpg","assets/p04-keyboard.jpg","assets/p05-bottle.jpg","assets/p06-humidifier.jpg","assets/p07-lamp.jpg","assets/p08-organizer.jpg"];
 let toastTimer = null;
 
@@ -551,13 +564,14 @@ function openEdit(id){
   $("#fFreeShip").checked = p ? p.free_shipping !== false : true;
   $("#fShipFee").value = p ? (p.shipping_fee || 0) : 0;
   $("#fImg").value = p ? (p.image || "") : "";
-  $("#fImages").value = p && p.images && p.images.length ? p.images.join("\n") : "";
+  gallery = p && p.images && p.images.length ? p.images.slice() : (p && p.image ? [p.image] : []);
   $("#fDesc").value = p ? (p.description || "") : "";
   $("#fFeats").value = p ? (p.feats || []).join("\n") : "";
   ["en", "ru"].forEach(ln => fillTr(ln, p && p.i18n ? p.i18n[ln] : null));
   syncShipFee();
   buildPicks(p ? p.image : "");
   updatePreview();
+  renderGallery();
   $("#overlay").classList.add("show");
   setTimeout(() => $("#fName").focus(), 60);
 }
@@ -590,6 +604,72 @@ function updatePreview(){
   else img.style.display = "none";
 }
 
+/* ===== 图集上传墙 ===== */
+function renderGallery(){
+  const box = $("#galGrid");
+  let html = gallery.map((src, i) => `
+    <div class="gal-item${i === 0 ? " main" : ""}" data-i="${i}">
+      <img src="${esc(src)}" alt="" data-src="${src}">
+      ${i === 0 ? '<span class="gal-badge">主图</span>' : ""}
+      <button type="button" class="gal-del" data-del="${i}" title="删除">×</button>
+    </div>`).join("");
+  html += `<div class="gal-add" id="galAdd"><span class="plus">+</span><span>上传图片</span></div>`;
+  box.innerHTML = html;
+
+  box.querySelectorAll(".gal-item img").forEach(im => {
+    im.addEventListener("click", () => {
+      const item = im.closest(".gal-item");
+      const i = Number(item.dataset.i);
+      const src = im.dataset.src;
+      gallery.splice(i, 1);
+      gallery.unshift(src); // 点击设为主图：移到第一位
+      $("#fImg").value = src;
+      updatePreview();
+      renderGallery();
+    });
+  });
+  box.querySelectorAll("[data-del]").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      gallery.splice(Number(btn.dataset.del), 1);
+      renderGallery();
+    });
+  });
+  $("#galAdd").addEventListener("click", () => $("#galFile").click());
+}
+
+$("#galFile").addEventListener("change", async (e) => {
+  const files = Array.from(e.target.files || []);
+  e.target.value = "";
+  if (!files.length) return;
+  const add = $("#galAdd");
+  const label = add ? add.querySelector("span:last-child") : null;
+  if (add) add.classList.add("busy");
+  if (label) label.textContent = "上传中…";
+  try {
+    const fd = new FormData();
+    files.forEach(f => fd.append("files", f));
+    const headers = {};
+    if (token) headers["Authorization"] = "Bearer " + token;
+    const res = await fetch("/api/upload", { method: "POST", body: fd, headers });
+    let data = null;
+    try { data = await res.json(); } catch (_) {}
+    if (res.status === 401) { logout(); throw new Error("登录已失效"); }
+    if (res.ok && data && data.ok && Array.isArray(data.urls) && data.urls.length) {
+      gallery = gallery.concat(data.urls);
+      if (!$("#fImg").value.trim()) { $("#fImg").value = data.urls[0]; updatePreview(); }
+      renderGallery();
+      toast(`已上传 ${data.urls.length} 张图片`);
+    } else {
+      toast((data && data.error) || "上传失败");
+    }
+  } catch (err) {
+    toast("上传失败，请检查网络后重试");
+  }
+  if (add) add.classList.remove("busy");
+  if (label) label.textContent = "上传图片";
+});
+
 $("#modalClose").addEventListener("click", closeModal);
 $("#cancelBtn").addEventListener("click", closeModal);
 $("#overlay").addEventListener("click", (e) => { if (e.target === $("#overlay")) closeModal(); });
@@ -598,7 +678,7 @@ function closeModal(){ $("#overlay").classList.remove("show"); }
 $("#productForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const id = $("#fId").value;
-  const images = $("#fImages").value.split("\n").map(s => s.trim()).filter(Boolean);
+  const images = gallery.slice();
   const mainImg = $("#fImg").value.trim();
   if (!images.length && mainImg) images.push(mainImg);
   const body = {
