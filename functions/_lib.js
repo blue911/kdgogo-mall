@@ -169,13 +169,22 @@ function parseImgArray(v) {
   return Array.isArray(arr) ? arr.map(String) : [];
 }
 
+/* 图片地址归一化：绝对地址取路径，便于相对/绝对两种写法按同一口径比对 */
+function normImageUrl(u) {
+  let s = String(u || "").trim();
+  if (/^https?:\/\//i.test(s)) {
+    try { s = new URL(s).pathname; } catch (e) {}
+  }
+  return s;
+}
+
 /* 汇总当前所有商品仍在引用的图片地址（主图 + 图集） */
 export async function referencedImageSet(env) {
   const { results } = await env.DB.prepare("SELECT image, images FROM products").all();
   const set = new Set();
   for (const r of results || []) {
-    if (r.image) set.add(String(r.image));
-    for (const im of parseImgArray(r.images)) if (im) set.add(String(im));
+    if (r.image) set.add(normImageUrl(r.image));
+    for (const im of parseImgArray(r.images)) if (im) set.add(normImageUrl(im));
   }
   return set;
 }
@@ -188,7 +197,7 @@ export async function cleanupOrphanImages(env, candidates) {
   try { refs = await referencedImageSet(env); } catch (e) { return out; }
   const seen = new Set();
   for (const raw of candidates || []) {
-    const url = String(raw || "").trim();
+    const url = normImageUrl(raw);
     if (!url || seen.has(url)) continue;
     seen.add(url);
     if (!url.startsWith("/images/")) { out.skipped.push(url); continue; }
